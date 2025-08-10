@@ -7,7 +7,16 @@
     "email": "jaganax@yahoo.co.in"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaganax/seat-chart-reactjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jaganax/seat-chart-reactjs/issues"
+  },
   "type": "module",
+  "main": "./dist/seat-chart-reactjs.js",
+  "types": "./dist/main.d.ts",
   "exports": {
     ".": {
       "import": "./dist/seat-chart-reactjs.js",

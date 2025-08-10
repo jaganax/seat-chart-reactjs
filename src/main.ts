@@ -1,3 +1,5 @@
+import "./index.css";
+
 export { Chart } from "./components/chart";
 export { Berth } from "./components/berth";
 export { Door } from "./components/door";

@@ -19,7 +19,10 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    dts({ tsconfigPath: "./tsconfig.app.json", exclude: ["**/*.stories.ts"] }),
+    dts({
+      tsconfigPath: "./tsconfig.app.json",
+      exclude: ["**/*.stories.ts", "**/*.test.ts"],
+    }),
   ],
   build: {
     lib: {
@@ -29,11 +32,7 @@ export default defineConfig({
       fileName: "seat-chart-reactjs",
     },
     rollupOptions: {
-      external: [
-        ...Object.keys(peerDependencies || {}),
-        "react/jsx-runtime",
-        /\.css$/,
-      ],
+      external: [...Object.keys(peerDependencies || {}), "react/jsx-runtime"],
       output: {
         globals: {
           react: "React",
