@@ -22,14 +22,14 @@ export default defineConfig({
     dts({
       tsconfigPath: "./tsconfig.app.json",
       exclude: ["**/*.stories.ts", "**/*.test.ts"],
+      rollupTypes: true,
     }),
   ],
   build: {
     lib: {
-      entry: path.join(dirname, "src/main.ts"),
+      entry: path.join(dirname, "src/index.ts"),
       name: "seat-chart-reactjs",
-      formats: ["es", "cjs", "umd"],
-      fileName: "seat-chart-reactjs",
+      fileName: "index",
     },
     rollupOptions: {
       external: [...Object.keys(peerDependencies || {}), "react/jsx-runtime"],
@@ -42,6 +42,7 @@ export default defineConfig({
       },
     },
     cssCodeSplit: true,
+    emptyOutDir: true,
   },
   test: {
     projects: [
