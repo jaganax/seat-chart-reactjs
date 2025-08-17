@@ -5,24 +5,33 @@ type SeatProps = {
   label: string;
   price?: number;
   type?: string;
-  isbooked?: boolean;
+  isBooked?: boolean;
+  isBlocked?: boolean;
   femaleOnly?: boolean;
-  clickCallBack: (label: string) => void;
+  clickCallBack: () => boolean;
 };
 
 export const Seat = ({
   id,
   label,
-  isbooked,
+  isBooked,
+  isBlocked,
   femaleOnly,
   clickCallBack,
 }: SeatProps) => {
   const [available, setAvailable] = useState(false);
 
-  return isbooked ? (
+  return isBooked ? (
     <div
       id={id}
       className="relative select-none text-xs text-white rounded-xs size-8 flex items-center justify-center cursor-not-allowed bg-gray-500 border-gray-600"
+    >
+      {label}
+    </div>
+  ) : isBlocked ? (
+    <div
+      id={id}
+      className="relative select-none text-xs text-white rounded-xs size-8 flex items-center justify-center cursor-not-allowed bg-red-500 border-red-600"
     >
       {label}
     </div>
@@ -37,8 +46,11 @@ export const Seat = ({
           : "bg-green-500 border-green-600 hover:bg-green-400"
       }`}
       onClick={() => {
-        setAvailable((prev) => !prev);
-        clickCallBack("label");
+        if (clickCallBack()) {
+          setAvailable((prev) => !prev);
+        } else {
+          alert(`Reached maximum allowed seats per booking`);
+        }
       }}
     >
       <svg

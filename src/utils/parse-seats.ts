@@ -5,8 +5,9 @@ export type TSeat = {
   label: string;
   type: string;
   price: number;
-  available?: boolean;
-  femaleOnly?: boolean;
+  isBooked: boolean;
+  isBlocked: boolean;
+  femaleOnly: boolean;
 };
 
 export const parseSeatMap = (
@@ -16,7 +17,10 @@ export const parseSeatMap = (
       price: number;
       type: string;
     };
-  }
+  },
+  bookedSeats?: string[],
+  blockedSeats?: string[],
+  femaleSeats?: string[]
 ): ParsedSeatMap => {
   const parsedSeatMap: ParsedSeatMap = [];
   let seatIndex = 0;
@@ -24,7 +28,7 @@ export const parseSeatMap = (
   seatMap.forEach((row, rowIndex) => {
     const seatPattern = /[a-z_]{1}(?:\[([0-9a-z_]+)(?:,([0-9a-z_ ]+))?\])?/gi;
     const matches = row.match(seatPattern) || [];
-    parsedSeatMap[rowIndex] = new Array(matches.length);
+    const seatRow: TSeat[] = [];
 
     matches.forEach((seat, colIndex) => {
       const seatDataPattern =
@@ -33,19 +37,36 @@ export const parseSeatMap = (
 
       if (seatData) {
         const char = seatData[1];
-        const id = seatData[2] || String(++seatIndex);
-        const label = seatData[3] || String(seatIndex);
-        const price = seatTypes[char]?.price || 0;
-        const type = seatTypes[char]?.type || "space";
+        const type = seatTypes[char]?.type ?? "space";
 
-        parsedSeatMap[rowIndex][colIndex] = {
-          id,
-          label,
-          price,
-          type,
-        };
+        if (type == "seat" || type == "berth") {
+          seatRow[colIndex] = {
+            id: (seatData[2] && String(++seatIndex)) ?? String(++seatIndex),
+            type,
+            label: seatData[3] ?? String(seatIndex),
+            price: seatTypes[char]?.price ?? 0,
+            isBooked:
+              bookedSeats?.includes(seatData[3] ?? String(seatIndex)) ?? false,
+            isBlocked:
+              blockedSeats?.includes(seatData[3] ?? String(seatIndex)) ?? false,
+            femaleOnly:
+              femaleSeats?.includes(seatData[3] ?? String(seatIndex)) ?? false,
+          };
+        } else {
+          seatRow[colIndex] = {
+            id: "",
+            label: "",
+            type,
+            price: 0,
+            isBooked: false,
+            isBlocked: false,
+            femaleOnly: false,
+          };
+        }
       }
     });
+
+    parsedSeatMap[rowIndex] = seatRow;
   });
 
   return parsedSeatMap;

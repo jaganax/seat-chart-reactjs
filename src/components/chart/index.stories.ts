@@ -26,10 +26,16 @@ export const Default: Story = {
       "a[1, R1]a_aa",
     ],
     seatTypes: {
-      a: { price: 100, type: "berth" },
+      a: { price: 100, type: "seat" },
       s: { price: 100, type: "seat" },
       d: { price: 150, type: "driver" },
       w: { price: 0, type: "door" },
     },
+    getSelectedSeats: (seats) => {
+      console.log("selected seats:", seats);
+    },
+    bookedSeats: ["2", "5", "8", "R1"],
+    blockedSeats: ["4", "3", "6"],
+    femaleSeats: ["10"],
   },
 };
