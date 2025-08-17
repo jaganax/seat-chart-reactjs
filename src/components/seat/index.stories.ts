@@ -15,7 +15,7 @@ export const Default: Story = {
   args: {
     id: "1",
     label: "99",
-    isbooked: false,
+    isBooked: false,
     femaleOnly: false,
   },
 };
