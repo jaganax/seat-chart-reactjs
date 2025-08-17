@@ -16,7 +16,7 @@ export const Default: Story = {
     seatMap: [
       "____d",
       "a[1, R1]a_ss",
-      "___ss",
+      "aa_ss",
       "a[1, R1]a_ss",
       "w__aa",
       "a[1, R1]a_ss",
@@ -26,10 +26,10 @@ export const Default: Story = {
       "a[1, R1]a_aa",
     ],
     seatTypes: {
-      a: { price: 100, type: "seat" },
-      s: { price: 100, type: "seat" },
-      d: { price: 150, type: "driver" },
-      w: { price: 0, type: "door" },
+      a: { type: "seat", price: 100 },
+      s: { type: "seat", price: 100 },
+      d: { type: "driver" },
+      w: { type: "door" },
     },
     getSelectedSeats: (seats) => {
       console.log("selected seats:", seats);

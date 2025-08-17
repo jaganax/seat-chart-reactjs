@@ -32,15 +32,15 @@ import { Chart } from "@jaganax/seat-chart-reactjs";
 const seatMap = [
   "____d",
   "a[1, R1]a_ss",
-  "___ss",
+  "aa_ss",
   "a[1, R1]a_ss",
   "w__aa",
   // ...more rows
 ];
 
 const seatTypes = {
-  a: { price: 100, type: "seat" },
-  s: { price: 100, type: "seat" },
+  a: { type: "seat", price: 100 },
+  s: { type: "seat", price: 100 },
   d: { type: "driver" },
   w: { type: "door" },
 };
