@@ -5,13 +5,14 @@ import { Door } from "../door";
 import { Driver } from "../driver";
 import { Berth } from "../berth";
 import { Seat } from "../seat";
+import { Legend } from "../legend";
 
 type ChartProps = {
   seatMap: string[];
   seatTypes: {
     [key: string]: {
-      price: number;
-      type: "seat" | "berth" | "driver" | "door" | "space";
+      price?: number;
+      type: "seat" | "berth" | "driver" | "door";
     };
   };
   getSelectedSeats?: (seats: SelectedSeat[]) => void;
@@ -19,11 +20,17 @@ type ChartProps = {
   bookedSeats?: string[];
   blockedSeats?: string[];
   femaleSeats?: string[];
+  legends?: {
+    status: "booked" | "available" | "blocked" | "selected" | "female";
+    type?: "seat" | "berth";
+  }[];
 };
 
 type SelectedSeat = {
-  label: string;
-  price: number;
+  type: string;
+  label?: string;
+  price?: number;
+  status: "available" | "booked" | "blocked" | "female";
 };
 
 export const Chart = ({
@@ -34,6 +41,7 @@ export const Chart = ({
   bookedSeats,
   blockedSeats,
   femaleSeats,
+  legends,
 }: ChartProps) => {
   const selectedSeats = useRef<SelectedSeat[]>([]);
   const parsedSeatMap = useMemo(
@@ -65,39 +73,44 @@ export const Chart = ({
   );
 
   return (
-    <div className="flex flex-col p-2 rounded-lg border border-gray-500 w-fit gap-2">
-      {parsedSeatMap.map((row, rowIndex) => {
-        return (
-          <div key={rowIndex} className="flex justify-center gap-2">
-            {row.map((seat, colIndex) => {
-              switch (seat.type) {
-                case "space":
-                  return <Space key={colIndex} />;
-                case "door":
-                  return <Door key={colIndex} />;
-                case "driver":
-                  return <Driver key={colIndex} />;
-                case "berth":
-                  return (
-                    <Berth
-                      key={colIndex}
-                      {...seat}
-                      clickCallBack={() => handleSeatClick(seat)}
-                    />
-                  );
-                default:
-                  return (
-                    <Seat
-                      key={colIndex}
-                      {...seat}
-                      clickCallBack={() => handleSeatClick(seat)}
-                    />
-                  );
-              }
-            })}
-          </div>
-        );
-      })}
-    </div>
+    <>
+      <div className="w-fit">
+        <div className="flex flex-col p-2 rounded-lg border border-gray-500 gap-2">
+          {parsedSeatMap.map((row, rowIndex) => {
+            return (
+              <div key={rowIndex} className="flex justify-center gap-2">
+                {row.map((seat, colIndex) => {
+                  switch (seat.type) {
+                    case "space":
+                      return <Space key={colIndex} />;
+                    case "door":
+                      return <Door key={colIndex} />;
+                    case "driver":
+                      return <Driver key={colIndex} />;
+                    case "berth":
+                      return (
+                        <Berth
+                          key={colIndex}
+                          {...seat}
+                          clickCallBack={() => handleSeatClick(seat)}
+                        />
+                      );
+                    default:
+                      return (
+                        <Seat
+                          key={colIndex}
+                          {...seat}
+                          clickCallBack={() => handleSeatClick(seat)}
+                        />
+                      );
+                  }
+                })}
+              </div>
+            );
+          })}
+        </div>
+        {legends && <Legend legends={legends} />}
+      </div>
+    </>
   );
 };

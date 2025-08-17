@@ -1,42 +1,40 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 type BerthProps = {
-  id: string;
-  label: string;
-  isbooked?: boolean;
-  femaleOnly?: boolean;
-  clickCallBack: (label: string) => void;
+  label?: string;
+  status: "booked" | "available" | "blocked" | "female" | "selected";
+  clickCallBack?: () => void;
 };
 
-export const Berth = ({
-  id,
-  label,
-  isbooked,
-  femaleOnly,
-  clickCallBack,
-}: BerthProps) => {
-  const [available, setAvailable] = useState(false);
+export const Berth = ({ label = "L4", status, clickCallBack }: BerthProps) => {
+  const [selected, setSelected] = useState(status == "selected");
 
-  return isbooked ? (
-    <div
-      id={id}
-      className="relative select-none text-xs text-white rounded-xs w-8 h-16 flex items-center justify-center [writing-mode:vertical-rl] cursor-not-allowed bg-gray-500 border-gray-600"
-    >
+  useLayoutEffect(() => {
+    setSelected(status == "selected");
+  }, [status]);
+
+  return status === "booked" ? (
+    <div className="relative select-none text-xs text-white rounded-xs w-8 h-16 flex items-center justify-center [writing-mode:vertical-rl] cursor-not-allowed bg-gray-500 border-gray-600">
+      {label}
+    </div>
+  ) : status === "blocked" ? (
+    <div className="relative select-none text-xs text-white rounded-xs w-8 h-16 flex items-center justify-center [writing-mode:vertical-rl] cursor-not-allowed bg-amber-500 border-amber-600">
       {label}
     </div>
   ) : (
     <div
-      id={id}
       className={`relative select-none text-xs text-white rounded-xs w-8 h-16 flex items-center justify-center [writing-mode:vertical-rl] cursor-pointer ${
-        available
+        selected
           ? "bg-blue-500 border-blue-600 hover:bg-blue-400"
-          : femaleOnly
+          : status == "female"
           ? "bg-pink-500 border-pink-600 hover:bg-pink-400"
           : "bg-green-500 border-green-600 hover:bg-green-400"
       }`}
       onClick={() => {
-        setAvailable((prev) => !prev);
-        clickCallBack("label");
+        if (clickCallBack) {
+          clickCallBack();
+          setSelected((prev) => !prev);
+        }
       }}
     >
       <svg

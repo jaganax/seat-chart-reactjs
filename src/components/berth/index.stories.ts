@@ -13,9 +13,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    id: "1",
     label: "L04",
-    isbooked: false,
-    femaleOnly: false,
+    status: "available",
+    clickCallBack: () => null,
   },
 };

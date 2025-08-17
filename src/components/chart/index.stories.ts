@@ -37,5 +37,12 @@ export const Default: Story = {
     bookedSeats: ["2", "5", "8", "R1"],
     blockedSeats: ["4", "3", "6"],
     femaleSeats: ["10"],
+    legends: [
+      { status: "booked", type: "seat" },
+      { status: "available", type: "seat" },
+      { status: "blocked", type: "seat" },
+      { status: "selected", type: "seat" },
+      { status: "female", type: "seat" },
+    ],
   },
 };

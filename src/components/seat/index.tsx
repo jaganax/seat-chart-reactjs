@@ -1,55 +1,39 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 type SeatProps = {
-  id: string;
-  label: string;
-  price?: number;
-  type?: string;
-  isBooked?: boolean;
-  isBlocked?: boolean;
-  femaleOnly?: boolean;
-  clickCallBack: () => boolean;
+  label?: string;
+  status: "booked" | "available" | "blocked" | "female" | "selected";
+  clickCallBack?: () => void;
 };
 
-export const Seat = ({
-  id,
-  label,
-  isBooked,
-  isBlocked,
-  femaleOnly,
-  clickCallBack,
-}: SeatProps) => {
-  const [available, setAvailable] = useState(false);
+export const Seat = ({ label = "1", status, clickCallBack }: SeatProps) => {
+  const [selected, setSelected] = useState(status == "selected");
 
-  return isBooked ? (
-    <div
-      id={id}
-      className="relative select-none text-xs text-white rounded-xs size-8 flex items-center justify-center cursor-not-allowed bg-gray-500 border-gray-600"
-    >
+  useLayoutEffect(() => {
+    setSelected(status == "selected");
+  }, [status]);
+
+  return status === "booked" ? (
+    <div className="relative select-none text-xs text-white rounded-xs size-8 flex items-center justify-center cursor-not-allowed bg-gray-500 border-gray-600">
       {label}
     </div>
-  ) : isBlocked ? (
-    <div
-      id={id}
-      className="relative select-none text-xs text-white rounded-xs size-8 flex items-center justify-center cursor-not-allowed bg-red-500 border-red-600"
-    >
+  ) : status === "blocked" ? (
+    <div className="relative select-none text-xs text-white rounded-xs size-8 flex items-center justify-center cursor-not-allowed bg-amber-500 border-amber-600">
       {label}
     </div>
   ) : (
     <div
-      id={id}
       className={`relative select-none text-xs text-white rounded-xs size-8 flex items-center justify-center cursor-pointer ${
-        available
+        selected
           ? "bg-blue-500 border-blue-600 hover:bg-blue-400"
-          : femaleOnly
+          : status === "female"
           ? "bg-pink-500 border-pink-600 hover:bg-pink-400"
           : "bg-green-500 border-green-600 hover:bg-green-400"
       }`}
       onClick={() => {
-        if (clickCallBack()) {
-          setAvailable((prev) => !prev);
-        } else {
-          alert(`Reached maximum allowed seats per booking`);
+        if (clickCallBack) {
+          clickCallBack();
+          setSelected((prev) => !prev);
         }
       }}
     >

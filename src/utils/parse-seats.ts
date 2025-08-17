@@ -1,20 +1,17 @@
 export type ParsedSeatMap = TSeat[][];
 
 export type TSeat = {
-  id: string;
-  label: string;
   type: string;
-  price: number;
-  isBooked: boolean;
-  isBlocked: boolean;
-  femaleOnly: boolean;
+  label?: string;
+  price?: number;
+  status: "available" | "booked" | "blocked" | "female";
 };
 
 export const parseSeatMap = (
   seatMap: string[],
   seatTypes: {
     [key: string]: {
-      price: number;
+      price?: number;
       type: string;
     };
   },
@@ -41,26 +38,22 @@ export const parseSeatMap = (
 
         if (type == "seat" || type == "berth") {
           seatRow[colIndex] = {
-            id: (seatData[2] && String(++seatIndex)) ?? String(++seatIndex),
             type,
-            label: seatData[3] ?? String(seatIndex),
+            label: seatData[3] ?? String(++seatIndex),
             price: seatTypes[char]?.price ?? 0,
-            isBooked:
-              bookedSeats?.includes(seatData[3] ?? String(seatIndex)) ?? false,
-            isBlocked:
-              blockedSeats?.includes(seatData[3] ?? String(seatIndex)) ?? false,
-            femaleOnly:
-              femaleSeats?.includes(seatData[3] ?? String(seatIndex)) ?? false,
+            status: bookedSeats?.includes(seatData[3] ?? String(seatIndex))
+              ? "booked"
+              : blockedSeats?.includes(seatData[3] ?? String(seatIndex))
+              ? "blocked"
+              : femaleSeats?.includes(seatData[3] ?? String(seatIndex))
+              ? "female"
+              : "available",
           };
         } else {
           seatRow[colIndex] = {
-            id: "",
-            label: "",
             type,
-            price: 0,
-            isBooked: false,
-            isBlocked: false,
-            femaleOnly: false,
+            label: "",
+            status: "available",
           };
         }
       }
