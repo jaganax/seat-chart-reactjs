@@ -1,5 +1,5 @@
-import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { Chart } from './index';
 import type { ChartProps, SeatTypeConfig, LegendItem } from '../../types';

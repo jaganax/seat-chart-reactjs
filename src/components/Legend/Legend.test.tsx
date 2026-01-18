@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { Legend } from './index';
 import type { LegendItem } from '../../types';
 
@@ -126,7 +127,7 @@ describe('Legend Component', () => {
   describe('Legend row layout', () => {
     it('should display seat button and status text side by side', () => {
       const legends: LegendItem[] = [{ status: 'available' }];
-      const { container } = render(<Legend legends={legends} />);
+      render(<Legend legends={legends} />);
       const listitem = screen.getByRole('listitem');
 
       // Check that the listitem contains both button and text
