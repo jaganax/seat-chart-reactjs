@@ -1,66 +1,88 @@
-export type ParsedSeatMap = TSeat[][];
+import type {
+  ParsedCell,
+  ParsedSeat,
+  ParsedLayoutCell,
+  SeatStatus,
+  SeatTypeConfig,
+} from "../types";
 
-export type TSeat = {
-  type: string;
-  label?: string;
-  price?: number;
-  status: "available" | "booked" | "blocked" | "female";
-};
+export type ParsedSeatMap = ParsedCell[][];
 
-export const parseSeatMap = (
+export interface ParseSeatMapResult {
+  seatMap: ParsedSeatMap;
+  /** The next seat index (for continuing numbering across layers) */
+  nextIndex: number;
+}
+
+/**
+ * Parse a seat map string array into structured cell data.
+ *
+ * Seat map notation:
+ * - Single lowercase letter maps to a seat type in seatTypes config
+ * - `_` represents empty space
+ * - `[n]` or `[n, label]` syntax for custom seat numbering/labeling
+ *   Example: `a[1, R1]` creates a seat with label "R1"
+ */
+export function parseSeatMap(
   seatMap: string[],
-  seatTypes: {
-    [key: string]: {
-      price?: number;
-      type: string;
-    };
-  },
-  bookedSeats?: string[],
-  blockedSeats?: string[],
-  femaleSeats?: string[]
-): ParsedSeatMap => {
+  seatTypes: Record<string, SeatTypeConfig>,
+  bookedSeats: string[] = [],
+  blockedSeats: string[] = [],
+  startIndex: number = 0
+): ParseSeatMapResult {
   const parsedSeatMap: ParsedSeatMap = [];
-  let seatIndex = 0;
+  let seatIndex = startIndex;
 
-  seatMap.forEach((row, rowIndex) => {
-    const seatPattern = /[a-z_]{1}(?:\[([0-9a-z_]+)(?:,([0-9a-z_ ]+))?\])?/gi;
+  const bookedSet = new Set(bookedSeats);
+  const blockedSet = new Set(blockedSeats);
+
+  for (let rowIndex = 0; rowIndex < seatMap.length; rowIndex++) {
+    const row = seatMap[rowIndex];
+    const seatPattern = /[a-z_](?:\[([0-9a-z_]+)(?:,([0-9a-z_ ]+))?\])?/gi;
     const matches = row.match(seatPattern) || [];
-    const seatRow: TSeat[] = [];
+    const seatRow: ParsedCell[] = [];
 
-    matches.forEach((seat, colIndex) => {
+    for (let colIndex = 0; colIndex < matches.length; colIndex++) {
+      const seat = matches[colIndex];
       const seatDataPattern =
-        /([a-z_]{1})(?:\[([0-9a-z_]+)(?:,([0-9a-z_ ]+))?\])?/i;
+        /([a-z_])(?:\[([0-9a-z_]+)(?:,([0-9a-z_ ]+))?\])?/i;
       const seatData = seat.match(seatDataPattern);
 
       if (seatData) {
         const char = seatData[1];
-        const type = seatTypes[char]?.type ?? "space";
+        const config = seatTypes[char];
+        const type = config?.type ?? "space";
 
-        if (type == "seat" || type == "berth") {
-          seatRow[colIndex] = {
+        if (type === "seat" || type === "berth") {
+          const label = seatData[3]?.trim() ?? String(++seatIndex);
+          const status = getStatus(label, bookedSet, blockedSet);
+
+          const parsedSeat: ParsedSeat = {
             type,
-            label: seatData[3] ?? String(++seatIndex),
-            price: seatTypes[char]?.price ?? 0,
-            status: bookedSeats?.includes(seatData[3] ?? String(seatIndex))
-              ? "booked"
-              : blockedSeats?.includes(seatData[3] ?? String(seatIndex))
-              ? "blocked"
-              : femaleSeats?.includes(seatData[3] ?? String(seatIndex))
-              ? "female"
-              : "available",
+            label,
+            price: config?.price ?? 0,
+            status,
           };
+          seatRow.push(parsedSeat);
         } else {
-          seatRow[colIndex] = {
-            type,
-            label: "",
-            status: "available",
-          };
+          const layoutCell: ParsedLayoutCell = { type };
+          seatRow.push(layoutCell);
         }
       }
-    });
+    }
 
-    parsedSeatMap[rowIndex] = seatRow;
-  });
+    parsedSeatMap.push(seatRow);
+  }
 
-  return parsedSeatMap;
-};
+  return { seatMap: parsedSeatMap, nextIndex: seatIndex };
+}
+
+function getStatus(
+  label: string,
+  bookedSet: Set<string>,
+  blockedSet: Set<string>
+): SeatStatus {
+  if (bookedSet.has(label)) return "booked";
+  if (blockedSet.has(label)) return "blocked";
+  return "available";
+}

@@ -1,3 +1,14 @@
 import "./index.css";
 
-export { Chart } from "./components/chart";
+// Main component
+export { Chart } from "./components/Chart";
+
+// Types
+export type {
+  ChartProps,
+  SeatStatus,
+  SeatType,
+  SelectedSeat,
+  LegendItem,
+  SeatTypeConfig,
+} from "./types";
