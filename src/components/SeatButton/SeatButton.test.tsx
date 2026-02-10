@@ -73,12 +73,12 @@ describe('SeatButton Component', () => {
       expect(button).toHaveAttribute('aria-label', 'Seat A1, available');
     });
 
-    it('should have aria-pressed for selection state', () => {
+    it('should have aria-selected for selection state', () => {
       const { rerender } = render(<SeatButton {...defaultProps} isSelected={false} />);
-      expect(screen.getByRole('gridcell')).toHaveAttribute('aria-pressed', 'false');
+      expect(screen.getByRole('gridcell')).toHaveAttribute('aria-selected', 'false');
 
       rerender(<SeatButton {...defaultProps} isSelected={true} />);
-      expect(screen.getByRole('gridcell')).toHaveAttribute('aria-pressed', 'true');
+      expect(screen.getByRole('gridcell')).toHaveAttribute('aria-selected', 'true');
     });
 
     it('should have aria-disabled for non-available seats', () => {

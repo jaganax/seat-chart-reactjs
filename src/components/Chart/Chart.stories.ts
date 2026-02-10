@@ -50,11 +50,17 @@ export const SleeperBus: Story = {
     seatMaps: [
       "____d",
       "b[1,L1]b_bb",
+      "-----",
       "bb_bb",
+      "-----",
       "bb_bb",
+      "-----",
       "w__bb",
+      "-----",
       "bb_bb",
+      "-----",
       "bb_bb",
+      "-----",
     ],
     seatTypes: {
       b: { type: "berth", price: 200 },

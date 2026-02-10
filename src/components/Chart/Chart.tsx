@@ -5,6 +5,7 @@ import { parseSeatMap } from "../../utils/parse-seats";
 import type { ParsedSeatMap } from "../../utils/parse-seats";
 import { cn } from "../../utils/cn";
 import { useSelection } from "../../hooks/useSelection";
+import { useGridNavigation } from "../../hooks/useGridNavigation";
 import { SeatButton } from "../SeatButton";
 import { LayoutCell } from "../LayoutCell";
 import { Legend } from "../Legend";
@@ -35,6 +36,12 @@ export const Chart = memo(function Chart({
   disabled = false,
   className,
 }: ChartProps) {
+  // Serialize dependencies to stabilize memoization against inline objects/arrays
+  const seatMapsKey = JSON.stringify(seatMaps);
+  const seatTypesKey = JSON.stringify(seatTypes);
+  const bookedKey = bookedSeats?.join(",") ?? "";
+  const blockedKey = blockedSeats?.join(",") ?? "";
+
   // Parse seat maps for all layers, continuing seat index across layers
   const parsedLayers = useMemo((): ParsedLayer[] => {
     // Check if seatMaps is an array (single layer) or object (multi-layer)
@@ -51,10 +58,11 @@ export const Chart = memo(function Chart({
       currentIndex = result.nextIndex;
     }
     return layers;
-  }, [seatMaps, seatTypes, bookedSeats, blockedSeats]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seatMapsKey, seatTypesKey, bookedKey, blockedKey]);
 
   // Selection management
-  const { isSelected, toggleSelection } = useSelection({
+  const { selectedLabels, toggleSelection } = useSelection({
     onSelectionChange,
     maxSelectableSeats,
     onMaxSeatsReached,
@@ -70,7 +78,7 @@ export const Chart = memo(function Chart({
             key={layer.name || layerIndex}
             layer={layer}
             layerIndex={layerIndex}
-            isSelected={isSelected}
+            selectedLabels={selectedLabels}
             onToggle={toggleSelection}
             disabled={disabled}
           />
@@ -84,7 +92,7 @@ export const Chart = memo(function Chart({
 interface ChartLayerProps {
   layer: ParsedLayer;
   layerIndex: number;
-  isSelected: (label: string) => boolean;
+  selectedLabels: Set<string>;
   onToggle: (seat: {
     label: string;
     type: SeatType;
@@ -97,10 +105,12 @@ interface ChartLayerProps {
 const ChartLayer = memo(function ChartLayer({
   layer,
   layerIndex,
-  isSelected,
+  selectedLabels,
   onToggle,
   disabled,
 }: ChartLayerProps) {
+  const { gridRef, handleGridKeyDown } = useGridNavigation();
+
   // Calculate grid dimensions and check for berths
   const { numCols, hasBerths } = useMemo(() => {
     let maxCols = 0;
@@ -124,9 +134,12 @@ const ChartLayer = memo(function ChartLayer({
           </div>
         )}
         <div
+          ref={gridRef}
           role="grid"
+          tabIndex={-1}
           aria-label={layer.name || "Seat chart"}
           className="flex flex-col p-2 rounded-lg border border-gray-500 gap-2"
+          onKeyDown={handleGridKeyDown}
         >
           {layer.seatMap.map((row, rowIndex) => (
             <div key={rowIndex} role="row" className="flex justify-center gap-2">
@@ -134,7 +147,7 @@ const ChartLayer = memo(function ChartLayer({
                 <ChartCell
                   key={`${layerIndex}-${rowIndex}-${colIndex}`}
                   cell={cell}
-                  isSelected={isSelected}
+                  selected={isParsedSeat(cell) && selectedLabels.has(cell.label)}
                   onToggle={onToggle}
                   disabled={disabled}
                 />
@@ -157,9 +170,12 @@ const ChartLayer = memo(function ChartLayer({
         </div>
       )}
       <div
+        ref={gridRef}
         role="grid"
+        tabIndex={-1}
         aria-label={layer.name || "Seat chart"}
         className="grid p-2 rounded-lg border border-gray-500 gap-2 justify-center"
+        onKeyDown={handleGridKeyDown}
         style={{
           gridTemplateColumns: `repeat(${numCols}, auto)`,
         }}
@@ -169,7 +185,7 @@ const ChartLayer = memo(function ChartLayer({
             <ChartCell
               key={`${layerIndex}-${rowIndex}-${colIndex}`}
               cell={cell}
-              isSelected={isSelected}
+              selected={isParsedSeat(cell) && selectedLabels.has(cell.label)}
               onToggle={onToggle}
               disabled={disabled}
               gridRow={rowIndex + 1}
@@ -184,7 +200,7 @@ const ChartLayer = memo(function ChartLayer({
 
 interface ChartCellProps {
   cell: ParsedCell;
-  isSelected: (label: string) => boolean;
+  selected: boolean;
   onToggle: (seat: {
     label: string;
     type: SeatType;
@@ -198,7 +214,7 @@ interface ChartCellProps {
 
 const ChartCell = memo(function ChartCell({
   cell,
-  isSelected,
+  selected,
   onToggle,
   disabled,
   gridRow,
@@ -226,7 +242,7 @@ const ChartCell = memo(function ChartCell({
           label={cell.label}
           price={cell.price}
           status={cell.status}
-          isSelected={isSelected(cell.label)}
+          isSelected={selected}
           disabled={disabled}
           onClick={handleClick}
         />

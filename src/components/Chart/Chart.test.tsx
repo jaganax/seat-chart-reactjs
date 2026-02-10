@@ -89,15 +89,15 @@ describe('Chart Component', () => {
       ]);
     });
 
-    it('should update aria-pressed on selected seats', async () => {
+    it('should update aria-selected on selected seats', async () => {
       const user = userEvent.setup();
       render(<Chart {...defaultProps} />);
 
       const seats = screen.getAllByRole('gridcell');
-      expect(seats[0]).toHaveAttribute('aria-pressed', 'false');
+      expect(seats[0]).toHaveAttribute('aria-selected', 'false');
 
       await user.click(seats[0]);
-      expect(seats[0]).toHaveAttribute('aria-pressed', 'true');
+      expect(seats[0]).toHaveAttribute('aria-selected', 'true');
     });
   });
 
@@ -375,6 +375,51 @@ describe('Chart Component', () => {
 
       fireEvent.keyDown(seats[0], { key: ' ' });
       expect(onSelectionChange).toHaveBeenCalled();
+    });
+  });
+
+  describe('Arrow key navigation', () => {
+    it('should move focus right with ArrowRight', () => {
+      render(<Chart {...defaultProps} />);
+
+      const seats = screen.getAllByRole('gridcell');
+      seats[0].focus();
+      expect(document.activeElement).toBe(seats[0]);
+
+      fireEvent.keyDown(seats[0], { key: 'ArrowRight' });
+      expect(document.activeElement).toBe(seats[1]);
+    });
+
+    it('should move focus left with ArrowLeft', () => {
+      render(<Chart {...defaultProps} />);
+
+      const seats = screen.getAllByRole('gridcell');
+      seats[1].focus();
+      expect(document.activeElement).toBe(seats[1]);
+
+      fireEvent.keyDown(seats[1], { key: 'ArrowLeft' });
+      expect(document.activeElement).toBe(seats[0]);
+    });
+
+    it('should not move past the first cell with ArrowLeft', () => {
+      render(<Chart {...defaultProps} />);
+
+      const seats = screen.getAllByRole('gridcell');
+      seats[0].focus();
+
+      fireEvent.keyDown(seats[0], { key: 'ArrowLeft' });
+      expect(document.activeElement).toBe(seats[0]);
+    });
+
+    it('should not move past the last cell with ArrowRight', () => {
+      render(<Chart {...defaultProps} />);
+
+      const seats = screen.getAllByRole('gridcell');
+      const lastSeat = seats[seats.length - 1];
+      lastSeat.focus();
+
+      fireEvent.keyDown(lastSeat, { key: 'ArrowRight' });
+      expect(document.activeElement).toBe(lastSeat);
     });
   });
 

@@ -61,7 +61,7 @@ export const SeatButton = memo(function SeatButton({
     <button
       type="button"
       role="gridcell"
-      aria-pressed={isSelected}
+      aria-selected={isSelected}
       aria-disabled={!isInteractive || disabled}
       aria-label={ariaLabel}
       tabIndex={isInteractive && !disabled ? 0 : -1}
