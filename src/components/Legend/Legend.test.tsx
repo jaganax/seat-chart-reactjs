@@ -169,7 +169,7 @@ describe('Legend Component', () => {
     it('should have explicit text color for legend labels', () => {
       const legends: LegendItem[] = [{ status: 'available' }];
       const { container } = render(<Legend legends={legends} />);
-      const textEl = container.querySelector('.text-sm.capitalize');
+      const textEl = container.querySelector('.text-xs.capitalize');
       expect(textEl?.className).toContain('text-gray-700');
       expect(textEl?.className).toContain('dark:text-gray-300');
     });
