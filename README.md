@@ -32,7 +32,8 @@ Peer dependencies:
 /* app/globals.css or your main CSS file */
 @import "tailwindcss";
 
-@source "../../node_modules/@jaganax/seat-chart-reactjs/dist";
+/* Adjust the path based on your CSS file's location relative to node_modules */
+@source "../node_modules/@jaganax/seat-chart-reactjs/dist";
 
 @custom-variant dark (&:where(.dark, .dark *));
 ```
