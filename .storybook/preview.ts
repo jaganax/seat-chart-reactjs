@@ -1,7 +1,7 @@
 import type { Preview } from "@storybook/react-vite";
 import { useDarkMode } from "storybook-dark-mode";
 import { useEffect } from "react";
-import "../src/index.css";
+import "./storybook.css";
 
 const preview: Preview = {
   decorators: [

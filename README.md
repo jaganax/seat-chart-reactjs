@@ -24,6 +24,25 @@ Peer dependencies:
 - React 19+
 - React DOM 19+
 
+### Styling Setup
+
+**If your project uses Tailwind CSS v4** (Next.js, Vite, etc.), add `@source` to your CSS file so Tailwind generates the component styles alongside your own — do **not** import the library CSS:
+
+```css
+/* app/globals.css or your main CSS file */
+@import "tailwindcss";
+
+@source "../../node_modules/@jaganax/seat-chart-reactjs/dist";
+
+@custom-variant dark (&:where(.dark, .dark *));
+```
+
+**If your project does NOT use Tailwind**, import the pre-built CSS:
+
+```js
+import "@jaganax/seat-chart-reactjs/styles.css";
+```
+
 ## Usage
 
 ### Single Layer
@@ -131,6 +150,7 @@ const seatTypes = {
 | `legends`            | `LegendItem[]`                         | Array of legend items for seat statuses             |
 | `disabled`           | `boolean`                              | Disable all seat selection                          |
 | `className`          | `string`                               | Additional CSS class for the chart container        |
+| `priceFormatter`     | `(price: number) => string`            | Custom price formatter for aria-labels (default: `$<price>`) |
 
 ## Types
 
