@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import { SeatButton } from './index';
 
 describe('SeatButton Component', () => {
@@ -104,7 +104,7 @@ describe('SeatButton Component', () => {
 
   describe('Click handling', () => {
     it('should call onClick when clicked on available seat', async () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const user = userEvent.setup();
       render(<SeatButton {...defaultProps} onClick={onClick} />);
 
@@ -113,7 +113,7 @@ describe('SeatButton Component', () => {
     });
 
     it('should not call onClick when clicked on booked seat', async () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const user = userEvent.setup();
       render(<SeatButton {...defaultProps} status="booked" onClick={onClick} />);
 
@@ -122,7 +122,7 @@ describe('SeatButton Component', () => {
     });
 
     it('should not call onClick when clicked on blocked seat', async () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const user = userEvent.setup();
       render(<SeatButton {...defaultProps} status="blocked" onClick={onClick} />);
 
@@ -131,7 +131,7 @@ describe('SeatButton Component', () => {
     });
 
     it('should not call onClick when disabled', async () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const user = userEvent.setup();
       render(<SeatButton {...defaultProps} disabled onClick={onClick} />);
 
@@ -142,7 +142,7 @@ describe('SeatButton Component', () => {
 
   describe('Keyboard handling', () => {
     it('should call onClick when Enter is pressed on available seat', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(<SeatButton {...defaultProps} onClick={onClick} />);
 
       fireEvent.keyDown(screen.getByRole('gridcell'), { key: 'Enter' });
@@ -150,7 +150,7 @@ describe('SeatButton Component', () => {
     });
 
     it('should call onClick when Space is pressed on available seat', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(<SeatButton {...defaultProps} onClick={onClick} />);
 
       fireEvent.keyDown(screen.getByRole('gridcell'), { key: ' ' });
@@ -158,7 +158,7 @@ describe('SeatButton Component', () => {
     });
 
     it('should not call onClick when other keys are pressed', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(<SeatButton {...defaultProps} onClick={onClick} />);
 
       fireEvent.keyDown(screen.getByRole('gridcell'), { key: 'Tab' });
@@ -168,7 +168,7 @@ describe('SeatButton Component', () => {
     });
 
     it('should not call onClick on Enter when disabled', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(<SeatButton {...defaultProps} disabled onClick={onClick} />);
 
       fireEvent.keyDown(screen.getByRole('gridcell'), { key: 'Enter' });
@@ -176,7 +176,7 @@ describe('SeatButton Component', () => {
     });
 
     it('should not call onClick on Enter when booked', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       render(<SeatButton {...defaultProps} status="booked" onClick={onClick} />);
 
       fireEvent.keyDown(screen.getByRole('gridcell'), { key: 'Enter' });

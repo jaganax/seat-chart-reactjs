@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 import { Chart } from './index';
 import type { ChartProps, SeatTypeConfig, LegendItem } from '../../types';
 
@@ -47,7 +47,7 @@ describe('Chart Component', () => {
 
   describe('Seat selection', () => {
     it('should allow selecting a seat', async () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
@@ -60,7 +60,7 @@ describe('Chart Component', () => {
     });
 
     it('should allow deselecting a seat', async () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
@@ -75,7 +75,7 @@ describe('Chart Component', () => {
     });
 
     it('should allow selecting multiple seats', async () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
@@ -103,8 +103,8 @@ describe('Chart Component', () => {
 
   describe('Max selection limit', () => {
     it('should enforce maxSelectableSeats', async () => {
-      const onSelectionChange = jest.fn();
-      const onMaxSeatsReached = jest.fn();
+      const onSelectionChange = vi.fn();
+      const onMaxSeatsReached = vi.fn();
       const user = userEvent.setup();
 
       render(
@@ -132,7 +132,7 @@ describe('Chart Component', () => {
 
   describe('Booked and blocked seats', () => {
     it('should render booked seats as non-interactive', async () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
       render(
@@ -150,7 +150,7 @@ describe('Chart Component', () => {
     });
 
     it('should render blocked seats as non-interactive', async () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
       render(
@@ -177,7 +177,7 @@ describe('Chart Component', () => {
 
   describe('Disabled state', () => {
     it('should disable all seats when disabled prop is true', async () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
       render(
@@ -246,7 +246,7 @@ describe('Chart Component', () => {
         'Lower Deck': ['aa'], // Seats 1, 2
         'Upper Deck': ['aa'], // Seats 3, 4
       };
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
       render(
@@ -289,7 +289,7 @@ describe('Chart Component', () => {
 
     it('should handle berth selection', async () => {
       const berthSeatMap = ['bb'];
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
       render(
@@ -331,7 +331,7 @@ describe('Chart Component', () => {
   describe('Custom labeling', () => {
     it('should use custom labels from seat map notation', async () => {
       const customLabelSeatMap = ['a[1,R1]a[2,R2]'];
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
       render(
@@ -356,7 +356,7 @@ describe('Chart Component', () => {
 
   describe('Keyboard navigation', () => {
     it('should allow selecting seats with keyboard', () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
       const seats = screen.getAllByRole('gridcell');
@@ -367,7 +367,7 @@ describe('Chart Component', () => {
     });
 
     it('should allow selecting seats with Space key', () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
       const seats = screen.getAllByRole('gridcell');

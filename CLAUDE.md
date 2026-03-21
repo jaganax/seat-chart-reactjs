@@ -11,14 +11,22 @@ This is a React component library (`@jaganax/seat-chart-reactjs`) that provides 
 - `npm run build` - Build the library (TypeScript compilation + Vite build)
 - `npm run lint` - Run ESLint (includes jsx-a11y rules)
 - `npm run storybook` - Start Storybook dev server on port 6006
-- `npm test` - Run Jest tests (uses jsdom, requires `--experimental-vm-modules`)
+- `npm run build-storybook` - Build static Storybook site
+- `npm test` - Run Vitest unit tests (jsdom environment)
 - `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage (thresholds enforced at 85%)
+- `npm run test:coverage` - Run tests with coverage (thresholds enforced at 85% for branches/functions/lines/statements; `src/index.ts` is excluded from coverage)
 
 Run a single test file:
 ```
-node --experimental-vm-modules node_modules/jest/bin/jest.js src/hooks/useSelection.test.ts
+npx vitest run --project unit src/hooks/useSelection.test.ts
 ```
+
+### Test Configuration
+
+All tests use Vitest, configured as two projects in `vite.config.ts`:
+
+- **unit** — Unit tests (`src/**/*.test.{ts,tsx}`), jsdom environment, globals enabled (`describe`/`it`/`expect` available without imports). Uses `vi.fn()` / `vi.spyOn()` for mocks.
+- **storybook** — Storybook interaction tests via `@storybook/addon-vitest`. Runs in headless Chromium via Playwright.
 
 ## Architecture
 

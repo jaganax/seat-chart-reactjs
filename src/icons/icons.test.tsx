@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { SeatIcon } from './SeatIcon';
 import { BerthIcon } from './BerthIcon';
 import { DriverIcon } from './DriverIcon';

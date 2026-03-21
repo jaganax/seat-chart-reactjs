@@ -1,5 +1,5 @@
 import { render, fireEvent, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { vi } from 'vitest';
 import { useGridNavigation } from './useGridNavigation';
 
 function TestGrid({ disabledIndices = [] as number[] }) {
@@ -82,16 +82,16 @@ describe('useGridNavigation', () => {
     // Mock getBoundingClientRect for spatial navigation
     // Row 1: cells[0] at (0,0), cells[1] at (40,0)
     // Row 2: cells[2] at (0,40), cells[3] at (40,40)
-    jest.spyOn(cells[0], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[0], 'getBoundingClientRect').mockReturnValue({
       top: 0, left: 0, width: 32, height: 32, bottom: 32, right: 32, x: 0, y: 0, toJSON: () => {},
     });
-    jest.spyOn(cells[1], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[1], 'getBoundingClientRect').mockReturnValue({
       top: 0, left: 40, width: 32, height: 32, bottom: 32, right: 72, x: 40, y: 0, toJSON: () => {},
     });
-    jest.spyOn(cells[2], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[2], 'getBoundingClientRect').mockReturnValue({
       top: 40, left: 0, width: 32, height: 32, bottom: 72, right: 32, x: 0, y: 40, toJSON: () => {},
     });
-    jest.spyOn(cells[3], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[3], 'getBoundingClientRect').mockReturnValue({
       top: 40, left: 40, width: 32, height: 32, bottom: 72, right: 72, x: 40, y: 40, toJSON: () => {},
     });
 
@@ -104,16 +104,16 @@ describe('useGridNavigation', () => {
     render(<TestGrid />);
     const cells = screen.getAllByRole('gridcell');
 
-    jest.spyOn(cells[0], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[0], 'getBoundingClientRect').mockReturnValue({
       top: 0, left: 0, width: 32, height: 32, bottom: 32, right: 32, x: 0, y: 0, toJSON: () => {},
     });
-    jest.spyOn(cells[1], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[1], 'getBoundingClientRect').mockReturnValue({
       top: 0, left: 40, width: 32, height: 32, bottom: 32, right: 72, x: 40, y: 0, toJSON: () => {},
     });
-    jest.spyOn(cells[2], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[2], 'getBoundingClientRect').mockReturnValue({
       top: 40, left: 0, width: 32, height: 32, bottom: 72, right: 32, x: 0, y: 40, toJSON: () => {},
     });
-    jest.spyOn(cells[3], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[3], 'getBoundingClientRect').mockReturnValue({
       top: 40, left: 40, width: 32, height: 32, bottom: 72, right: 72, x: 40, y: 40, toJSON: () => {},
     });
 
@@ -126,16 +126,16 @@ describe('useGridNavigation', () => {
     render(<TestGrid />);
     const cells = screen.getAllByRole('gridcell');
 
-    jest.spyOn(cells[0], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[0], 'getBoundingClientRect').mockReturnValue({
       top: 0, left: 0, width: 32, height: 32, bottom: 32, right: 32, x: 0, y: 0, toJSON: () => {},
     });
-    jest.spyOn(cells[1], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[1], 'getBoundingClientRect').mockReturnValue({
       top: 0, left: 40, width: 32, height: 32, bottom: 32, right: 72, x: 40, y: 0, toJSON: () => {},
     });
-    jest.spyOn(cells[2], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[2], 'getBoundingClientRect').mockReturnValue({
       top: 40, left: 0, width: 32, height: 32, bottom: 72, right: 32, x: 0, y: 40, toJSON: () => {},
     });
-    jest.spyOn(cells[3], 'getBoundingClientRect').mockReturnValue({
+    vi.spyOn(cells[3], 'getBoundingClientRect').mockReturnValue({
       top: 40, left: 40, width: 32, height: 32, bottom: 72, right: 72, x: 40, y: 40, toJSON: () => {},
     });
 

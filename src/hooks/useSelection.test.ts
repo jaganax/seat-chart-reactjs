@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
+import { vi } from 'vitest';
 import { useSelection } from './useSelection';
 
 describe('useSelection hook', () => {
@@ -42,7 +43,7 @@ describe('useSelection hook', () => {
 
   describe('toggleSelection', () => {
     it('should select a seat when not selected', () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const { result } = renderHook(() => useSelection({ onSelectionChange }));
 
       act(() => {
@@ -56,7 +57,7 @@ describe('useSelection hook', () => {
     });
 
     it('should deselect a seat when already selected', () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const { result } = renderHook(() => useSelection({ onSelectionChange }));
 
       act(() => {
@@ -72,7 +73,7 @@ describe('useSelection hook', () => {
     });
 
     it('should allow multiple selections', () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const { result } = renderHook(() => useSelection({ onSelectionChange }));
 
       act(() => {
@@ -89,8 +90,8 @@ describe('useSelection hook', () => {
 
   describe('maxSelectableSeats', () => {
     it('should enforce max selection limit', () => {
-      const onSelectionChange = jest.fn();
-      const onMaxSeatsReached = jest.fn();
+      const onSelectionChange = vi.fn();
+      const onMaxSeatsReached = vi.fn();
       const { result } = renderHook(() =>
         useSelection({
           onSelectionChange,
@@ -143,7 +144,7 @@ describe('useSelection hook', () => {
     });
 
     it('should work with maxSelectableSeats of 1', () => {
-      const onMaxSeatsReached = jest.fn();
+      const onMaxSeatsReached = vi.fn();
       const { result } = renderHook(() =>
         useSelection({ maxSelectableSeats: 1, onMaxSeatsReached })
       );
@@ -163,7 +164,7 @@ describe('useSelection hook', () => {
 
   describe('callbacks', () => {
     it('should call onSelectionChange with all selected seats', () => {
-      const onSelectionChange = jest.fn();
+      const onSelectionChange = vi.fn();
       const { result } = renderHook(() => useSelection({ onSelectionChange }));
 
       act(() => {
@@ -187,7 +188,7 @@ describe('useSelection hook', () => {
     });
 
     it('should not call onMaxSeatsReached when under limit', () => {
-      const onMaxSeatsReached = jest.fn();
+      const onMaxSeatsReached = vi.fn();
       const { result } = renderHook(() =>
         useSelection({ maxSelectableSeats: 3, onMaxSeatsReached })
       );
