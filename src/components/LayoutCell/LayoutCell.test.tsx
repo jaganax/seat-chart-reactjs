@@ -24,7 +24,19 @@ describe('LayoutCell Component', () => {
     it('should have correct size class', () => {
       const { container } = render(<LayoutCell type="driver" />);
       const cell = container.querySelector('[role="gridcell"]');
-      expect(cell?.className).toContain('size-8');
+      expect(cell?.className).toContain('size-10');
+    });
+
+    it('should have tabIndex={-1} for programmatic focusability', () => {
+      render(<LayoutCell type="driver" />);
+      const cell = screen.getByRole('gridcell');
+      expect(cell).toHaveAttribute('tabIndex', '-1');
+    });
+
+    it('should have focus ring styles', () => {
+      const { container } = render(<LayoutCell type="driver" />);
+      const cell = container.querySelector('[role="gridcell"]');
+      expect(cell?.className).toContain('focus:ring-2');
     });
   });
 
@@ -50,21 +62,27 @@ describe('LayoutCell Component', () => {
     it('should have correct size class', () => {
       const { container } = render(<LayoutCell type="door" />);
       const cell = container.querySelector('[role="gridcell"]');
-      expect(cell?.className).toContain('size-8');
+      expect(cell?.className).toContain('size-10');
+    });
+
+    it('should have tabIndex={-1} for programmatic focusability', () => {
+      render(<LayoutCell type="door" />);
+      const cell = screen.getByRole('gridcell');
+      expect(cell).toHaveAttribute('tabIndex', '-1');
     });
   });
 
   describe('Space type', () => {
     it('should render space layout cell', () => {
       render(<LayoutCell type="space" />);
-      const cell = screen.getByRole('gridcell', { hidden: true });
+      const cell = screen.getByRole('gridcell');
       expect(cell).toBeInTheDocument();
     });
 
-    it('should have aria-hidden for space', () => {
+    it('should have aria-label="Empty" for space', () => {
       render(<LayoutCell type="space" />);
-      const cell = screen.getByRole('gridcell', { hidden: true });
-      expect(cell).toHaveAttribute('aria-hidden', 'true');
+      const cell = screen.getByRole('gridcell');
+      expect(cell).toHaveAttribute('aria-label', 'Empty');
     });
 
     it('should not render any icon for space', () => {
@@ -76,7 +94,13 @@ describe('LayoutCell Component', () => {
     it('should have correct size class', () => {
       const { container } = render(<LayoutCell type="space" />);
       const cell = container.querySelector('[role="gridcell"]');
-      expect(cell?.className).toContain('size-8');
+      expect(cell?.className).toContain('size-10');
+    });
+
+    it('should have tabIndex={-1} for programmatic focusability', () => {
+      render(<LayoutCell type="space" />);
+      const cell = screen.getByRole('gridcell');
+      expect(cell).toHaveAttribute('tabIndex', '-1');
     });
   });
 
@@ -84,14 +108,13 @@ describe('LayoutCell Component', () => {
     it('should apply dark mode classes for driver icon', () => {
       const { container } = render(<LayoutCell type="driver" />);
       const svg = container.querySelector('svg');
-      // SVG className is an SVGAnimatedString, need to check baseVal or use classList
-      expect(svg?.classList.contains('dark:text-white')).toBe(true);
+      expect(svg?.classList.contains('dark:text-gray-300')).toBe(true);
     });
 
     it('should apply dark mode classes for door icon', () => {
       const { container } = render(<LayoutCell type="door" />);
       const svg = container.querySelector('svg');
-      expect(svg?.classList.contains('dark:text-white')).toBe(true);
+      expect(svg?.classList.contains('dark:text-gray-300')).toBe(true);
     });
   });
 

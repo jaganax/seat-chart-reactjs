@@ -48,6 +48,19 @@ export interface LegendItem {
   type?: SeatType;
 }
 
+// SeatButton props
+export interface SeatButtonProps {
+  type: SeatType;
+  label: string;
+  price: number;
+  status: SeatStatus;
+  isSelected: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
+  /** When true, renders as a decorative element without grid ARIA roles (for Legend) */
+  decorative?: boolean;
+}
+
 // Chart props
 export interface ChartProps {
   /** Seat maps - either a single array or an object with named layers */
@@ -70,17 +83,8 @@ export interface ChartProps {
   disabled?: boolean;
   /** Additional CSS class for the chart container */
   className?: string;
-}
-
-// SeatButton props
-export interface SeatButtonProps {
-  type: SeatType;
-  label: string;
-  price: number;
-  status: SeatStatus;
-  isSelected: boolean;
-  disabled?: boolean;
-  onClick?: () => void;
+  /** Custom price formatter for aria-labels (default: "$<price>") */
+  priceFormatter?: (price: number) => string;
 }
 
 // Legend props

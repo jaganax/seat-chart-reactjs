@@ -44,6 +44,27 @@ export default defineConfig({
     emptyOutDir: true,
   },
   test: {
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov", "html"],
+      reportsDirectory: "coverage",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.stories.{ts,tsx}",
+        "src/**/*.test.{ts,tsx}",
+        "src/**/*.d.ts",
+        "src/index.ts",
+        "src/hooks/index.ts",
+        "src/icons/index.ts",
+        "src/vite-env.d.ts",
+      ],
+      thresholds: {
+        branches: 85,
+        functions: 85,
+        lines: 85,
+        statements: 85,
+      },
+    },
     projects: [
       {
         extends: true,
@@ -54,21 +75,6 @@ export default defineConfig({
           include: ["src/**/*.test.{ts,tsx}"],
           setupFiles: ["./vitest.setup.ts"],
           css: true,
-          coverage: {
-            provider: "v8",
-            include: ["src/**/*.{ts,tsx}"],
-            exclude: [
-              "src/**/*.stories.{ts,tsx}",
-              "src/**/*.d.ts",
-              "src/index.ts",
-            ],
-            thresholds: {
-              branches: 85,
-              functions: 85,
-              lines: 85,
-              statements: 85,
-            },
-          },
         },
       },
       "./vitest.storybook.config.ts",

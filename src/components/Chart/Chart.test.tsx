@@ -28,9 +28,9 @@ describe('Chart Component', () => {
 
     it('should render seats from seat map', () => {
       render(<Chart {...defaultProps} />);
-      // 4 seats in a 2x2 grid
-      const seats = screen.getAllByRole('gridcell');
-      expect(seats).toHaveLength(4);
+      // 4 seats in a 2x2 grid — each seat has a gridcell wrapper
+      const gridcells = screen.getAllByRole('gridcell');
+      expect(gridcells).toHaveLength(4);
     });
 
     it('should render grid structure', () => {
@@ -51,8 +51,8 @@ describe('Chart Component', () => {
       const user = userEvent.setup();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      await user.click(seats[0]);
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]);
 
       expect(onSelectionChange).toHaveBeenCalledWith([
         expect.objectContaining({ label: '1', type: 'seat', price: 100 }),
@@ -64,12 +64,12 @@ describe('Chart Component', () => {
       const user = userEvent.setup();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
-      const seats = screen.getAllByRole('gridcell');
+      const buttons = screen.getAllByRole('button');
 
       // Select
-      await user.click(seats[0]);
+      await user.click(buttons[0]);
       // Deselect
-      await user.click(seats[0]);
+      await user.click(buttons[0]);
 
       expect(onSelectionChange).toHaveBeenLastCalledWith([]);
     });
@@ -79,9 +79,9 @@ describe('Chart Component', () => {
       const user = userEvent.setup();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      await user.click(seats[0]);
-      await user.click(seats[1]);
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]);
+      await user.click(buttons[1]);
 
       expect(onSelectionChange).toHaveBeenLastCalledWith([
         expect.objectContaining({ label: '1' }),
@@ -89,15 +89,16 @@ describe('Chart Component', () => {
       ]);
     });
 
-    it('should update aria-selected on selected seats', async () => {
+    it('should update aria-selected on gridcell wrapper when selected', async () => {
       const user = userEvent.setup();
       render(<Chart {...defaultProps} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      expect(seats[0]).toHaveAttribute('aria-selected', 'false');
+      const gridcells = screen.getAllByRole('gridcell');
+      expect(gridcells[0]).toHaveAttribute('aria-selected', 'false');
 
-      await user.click(seats[0]);
-      expect(seats[0]).toHaveAttribute('aria-selected', 'true');
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]);
+      expect(gridcells[0]).toHaveAttribute('aria-selected', 'true');
     });
   });
 
@@ -116,10 +117,10 @@ describe('Chart Component', () => {
         />
       );
 
-      const seats = screen.getAllByRole('gridcell');
-      await user.click(seats[0]);
-      await user.click(seats[1]);
-      await user.click(seats[2]); // Should trigger max reached
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]);
+      await user.click(buttons[1]);
+      await user.click(buttons[2]); // Should trigger max reached
 
       expect(onMaxSeatsReached).toHaveBeenCalledWith(2);
       // Only 2 seats should be selected
@@ -143,8 +144,8 @@ describe('Chart Component', () => {
         />
       );
 
-      const seats = screen.getAllByRole('gridcell');
-      await user.click(seats[0]); // Seat 1 is booked
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]); // Seat 1 is booked
 
       expect(onSelectionChange).not.toHaveBeenCalled();
     });
@@ -161,17 +162,17 @@ describe('Chart Component', () => {
         />
       );
 
-      const seats = screen.getAllByRole('gridcell');
-      await user.click(seats[1]); // Seat 2 is blocked
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[1]); // Seat 2 is blocked
 
       expect(onSelectionChange).not.toHaveBeenCalled();
     });
 
-    it('should have correct aria-disabled for booked seats', () => {
+    it('should have correct aria-disabled on button for booked seats', () => {
       render(<Chart {...defaultProps} bookedSeats={['1']} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      expect(seats[0]).toHaveAttribute('aria-disabled', 'true');
+      const buttons = screen.getAllByRole('button');
+      expect(buttons[0]).toHaveAttribute('aria-disabled', 'true');
     });
   });
 
@@ -184,8 +185,8 @@ describe('Chart Component', () => {
         <Chart {...defaultProps} disabled onSelectionChange={onSelectionChange} />
       );
 
-      const seats = screen.getAllByRole('gridcell');
-      await user.click(seats[0]);
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]);
 
       expect(onSelectionChange).not.toHaveBeenCalled();
     });
@@ -204,48 +205,114 @@ describe('Chart Component', () => {
       expect(screen.getAllByLabelText(/Seat \d/)).toHaveLength(3);
     });
 
-    it('should render space as aria-hidden', () => {
+    it('should render space as accessible with aria-label', () => {
       const seatMapWithSpace = ['a_a'];
-      const { container } = render(
+      render(
         <Chart {...defaultProps} seatMaps={seatMapWithSpace} />
       );
 
-      const hiddenCells = container.querySelectorAll('[aria-hidden="true"]');
-      expect(hiddenCells.length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByLabelText('Empty')).toBeInTheDocument();
     });
   });
 
   describe('Multi-layer support', () => {
-    it('should render multiple layers', () => {
-      const multiLayerSeatMaps = {
-        'Lower Deck': ['aa'],
-        'Upper Deck': ['aa'],
-      };
+    const multiLayerSeatMaps = {
+      'Lower Deck': ['aa'],
+      'Upper Deck': ['aa'],
+    };
 
+    it('should render tabs for multi-layer layout', () => {
       render(<Chart {...defaultProps} seatMaps={multiLayerSeatMaps} />);
 
-      // Should have 2 grids
-      const grids = screen.getAllByRole('grid');
-      expect(grids).toHaveLength(2);
+      const tablist = screen.getByRole('tablist');
+      expect(tablist).toBeInTheDocument();
+
+      const tabs = screen.getAllByRole('tab');
+      expect(tabs).toHaveLength(2);
+      expect(tabs[0]).toHaveTextContent('Lower Deck');
+      expect(tabs[1]).toHaveTextContent('Upper Deck');
     });
 
-    it('should display layer names', () => {
-      const multiLayerSeatMaps = {
-        'Lower Deck': ['aa'],
-        'Upper Deck': ['aa'],
-      };
-
+    it('should show first layer by default', () => {
       render(<Chart {...defaultProps} seatMaps={multiLayerSeatMaps} />);
 
-      expect(screen.getByText('Lower Deck')).toBeInTheDocument();
-      expect(screen.getByText('Upper Deck')).toBeInTheDocument();
+      const tabs = screen.getAllByRole('tab');
+      expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+      expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
+
+      // Only one grid visible (the active tab panel)
+      const grids = screen.getAllByRole('grid');
+      expect(grids).toHaveLength(1);
+    });
+
+    it('should switch layers when clicking tabs', async () => {
+      const user = userEvent.setup();
+      render(<Chart {...defaultProps} seatMaps={multiLayerSeatMaps} />);
+
+      // Initially shows Lower Deck seats (1, 2)
+      expect(screen.getByLabelText(/Seat 1/)).toBeInTheDocument();
+
+      // Click Upper Deck tab
+      const tabs = screen.getAllByRole('tab');
+      await user.click(tabs[1]);
+
+      // Now shows Upper Deck seats (3, 4)
+      expect(screen.getByLabelText(/Seat 3/)).toBeInTheDocument();
+      expect(screen.queryByLabelText(/Seat 1/)).not.toBeInTheDocument();
+    });
+
+    it('should navigate tabs with arrow keys', async () => {
+      render(<Chart {...defaultProps} seatMaps={multiLayerSeatMaps} />);
+
+      const tabs = screen.getAllByRole('tab');
+      tabs[0].focus();
+
+      fireEvent.keyDown(tabs[0], { key: 'ArrowRight' });
+      expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+      expect(document.activeElement).toBe(tabs[1]);
+
+      fireEvent.keyDown(tabs[1], { key: 'ArrowLeft' });
+      expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+      expect(document.activeElement).toBe(tabs[0]);
+    });
+
+    it('should wrap around with arrow key navigation', async () => {
+      render(<Chart {...defaultProps} seatMaps={multiLayerSeatMaps} />);
+
+      const tabs = screen.getAllByRole('tab');
+      tabs[1].focus();
+
+      // ArrowRight from last tab wraps to first
+      fireEvent.keyDown(tabs[1], { key: 'ArrowRight' });
+      expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('should support Home and End keys on tabs', () => {
+      render(<Chart {...defaultProps} seatMaps={multiLayerSeatMaps} />);
+
+      const tabs = screen.getAllByRole('tab');
+      tabs[0].focus();
+
+      fireEvent.keyDown(tabs[0], { key: 'End' });
+      expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+
+      fireEvent.keyDown(tabs[1], { key: 'Home' });
+      expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('should have proper tab panel ARIA linkage', () => {
+      render(<Chart {...defaultProps} seatMaps={multiLayerSeatMaps} />);
+
+      const tabs = screen.getAllByRole('tab');
+      const tabpanel = screen.getByRole('tabpanel');
+
+      // Active tab should control the visible panel
+      const controlsId = tabs[0].getAttribute('aria-controls');
+      expect(tabpanel).toHaveAttribute('id', controlsId);
+      expect(tabpanel).toHaveAttribute('aria-labelledby', tabs[0].id);
     });
 
     it('should continue seat numbering across layers', async () => {
-      const multiLayerSeatMaps = {
-        'Lower Deck': ['aa'], // Seats 1, 2
-        'Upper Deck': ['aa'], // Seats 3, 4
-      };
       const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
@@ -257,24 +324,50 @@ describe('Chart Component', () => {
         />
       );
 
-      const seats = screen.getAllByRole('gridcell');
-      await user.click(seats[3]); // Should be seat 4
+      // Switch to Upper Deck
+      const tabs = screen.getAllByRole('tab');
+      await user.click(tabs[1]);
+
+      const buttons = screen.getAllByRole('button');
+      // Filter out tab buttons — seat buttons have aria-label
+      const seatButtons = buttons.filter(b => b.getAttribute('aria-label')?.match(/Seat|Berth/));
+      await user.click(seatButtons[0]); // Should be seat 3
 
       expect(onSelectionChange).toHaveBeenCalledWith([
-        expect.objectContaining({ label: '4' }),
+        expect.objectContaining({ label: '3' }),
       ]);
     });
 
-    it('should use grid aria-label with layer name', () => {
-      const multiLayerSeatMaps = {
-        'Lower Deck': ['aa'],
-        'Upper Deck': ['aa'],
-      };
+    it('should preserve selection when switching tabs', async () => {
+      const onSelectionChange = vi.fn();
+      const user = userEvent.setup();
 
-      render(<Chart {...defaultProps} seatMaps={multiLayerSeatMaps} />);
+      render(
+        <Chart
+          {...defaultProps}
+          seatMaps={multiLayerSeatMaps}
+          onSelectionChange={onSelectionChange}
+        />
+      );
 
-      expect(screen.getByRole('grid', { name: 'Lower Deck' })).toBeInTheDocument();
-      expect(screen.getByRole('grid', { name: 'Upper Deck' })).toBeInTheDocument();
+      // Select seat on Lower Deck
+      const seatButtons = screen.getAllByRole('button').filter(b => b.getAttribute('aria-label')?.match(/Seat/));
+      await user.click(seatButtons[0]);
+
+      // Switch to Upper Deck and back
+      const tabs = screen.getAllByRole('tab');
+      await user.click(tabs[1]);
+      await user.click(tabs[0]);
+
+      // Seat 1 should still be selected
+      const gridcells = screen.getAllByRole('gridcell');
+      expect(gridcells[0]).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('should not render tabs for single-layer layout', () => {
+      render(<Chart {...defaultProps} />);
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+      expect(screen.queryByRole('tab')).not.toBeInTheDocument();
     });
   });
 
@@ -300,8 +393,8 @@ describe('Chart Component', () => {
         />
       );
 
-      const berths = screen.getAllByRole('gridcell');
-      await user.click(berths[0]);
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]);
 
       expect(onSelectionChange).toHaveBeenCalledWith([
         expect.objectContaining({ type: 'berth', price: 200 }),
@@ -345,8 +438,8 @@ describe('Chart Component', () => {
       expect(screen.getByLabelText(/Seat R1/)).toBeInTheDocument();
       expect(screen.getByLabelText(/Seat R2/)).toBeInTheDocument();
 
-      const seats = screen.getAllByRole('gridcell');
-      await user.click(seats[0]);
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]);
 
       expect(onSelectionChange).toHaveBeenCalledWith([
         expect.objectContaining({ label: 'R1' }),
@@ -359,10 +452,10 @@ describe('Chart Component', () => {
       const onSelectionChange = vi.fn();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      seats[0].focus();
+      const buttons = screen.getAllByRole('button');
+      buttons[0].focus();
 
-      fireEvent.keyDown(seats[0], { key: 'Enter' });
+      fireEvent.keyDown(buttons[0], { key: 'Enter' });
       expect(onSelectionChange).toHaveBeenCalled();
     });
 
@@ -370,10 +463,10 @@ describe('Chart Component', () => {
       const onSelectionChange = vi.fn();
       render(<Chart {...defaultProps} onSelectionChange={onSelectionChange} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      seats[0].focus();
+      const buttons = screen.getAllByRole('button');
+      buttons[0].focus();
 
-      fireEvent.keyDown(seats[0], { key: ' ' });
+      fireEvent.keyDown(buttons[0], { key: ' ' });
       expect(onSelectionChange).toHaveBeenCalled();
     });
   });
@@ -382,44 +475,44 @@ describe('Chart Component', () => {
     it('should move focus right with ArrowRight', () => {
       render(<Chart {...defaultProps} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      seats[0].focus();
-      expect(document.activeElement).toBe(seats[0]);
+      const buttons = screen.getAllByRole('button');
+      buttons[0].focus();
+      expect(document.activeElement).toBe(buttons[0]);
 
-      fireEvent.keyDown(seats[0], { key: 'ArrowRight' });
-      expect(document.activeElement).toBe(seats[1]);
+      fireEvent.keyDown(buttons[0], { key: 'ArrowRight' });
+      expect(document.activeElement).toBe(buttons[1]);
     });
 
     it('should move focus left with ArrowLeft', () => {
       render(<Chart {...defaultProps} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      seats[1].focus();
-      expect(document.activeElement).toBe(seats[1]);
+      const buttons = screen.getAllByRole('button');
+      buttons[1].focus();
+      expect(document.activeElement).toBe(buttons[1]);
 
-      fireEvent.keyDown(seats[1], { key: 'ArrowLeft' });
-      expect(document.activeElement).toBe(seats[0]);
+      fireEvent.keyDown(buttons[1], { key: 'ArrowLeft' });
+      expect(document.activeElement).toBe(buttons[0]);
     });
 
     it('should not move past the first cell with ArrowLeft', () => {
       render(<Chart {...defaultProps} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      seats[0].focus();
+      const buttons = screen.getAllByRole('button');
+      buttons[0].focus();
 
-      fireEvent.keyDown(seats[0], { key: 'ArrowLeft' });
-      expect(document.activeElement).toBe(seats[0]);
+      fireEvent.keyDown(buttons[0], { key: 'ArrowLeft' });
+      expect(document.activeElement).toBe(buttons[0]);
     });
 
     it('should not move past the last cell with ArrowRight', () => {
       render(<Chart {...defaultProps} />);
 
-      const seats = screen.getAllByRole('gridcell');
-      const lastSeat = seats[seats.length - 1];
-      lastSeat.focus();
+      const buttons = screen.getAllByRole('button');
+      const lastButton = buttons[buttons.length - 1];
+      lastButton.focus();
 
-      fireEvent.keyDown(lastSeat, { key: 'ArrowRight' });
-      expect(document.activeElement).toBe(lastSeat);
+      fireEvent.keyDown(lastButton, { key: 'ArrowRight' });
+      expect(document.activeElement).toBe(lastButton);
     });
   });
 
@@ -438,13 +531,91 @@ describe('Chart Component', () => {
       expect(screen.getByLabelText('Driver position')).toBeInTheDocument();
       // Door
       expect(screen.getByLabelText('Door')).toBeInTheDocument();
-      // 11 seats total: 2+1 + 2+1 + 4 = 10... wait let me count again
-      // Row 2: aa_a = 3 seats
-      // Row 3: aa_a = 3 seats
-      // Row 4: aaaa = 4 seats
-      // Total: 10 seats
+      // 10 seats total: 3 + 3 + 4
       const seats = screen.getAllByLabelText(/Seat \d/);
       expect(seats).toHaveLength(10);
+    });
+  });
+
+  describe('Accessibility features', () => {
+    it('should have sr-only keyboard instructions linked via aria-describedby', () => {
+      render(<Chart {...defaultProps} />);
+      const grid = screen.getByRole('grid');
+      const describedBy = grid.getAttribute('aria-describedby');
+      expect(describedBy).toBeTruthy();
+
+      const instructions = document.getElementById(describedBy!);
+      expect(instructions).toBeInTheDocument();
+      expect(instructions?.textContent).toContain('arrow keys');
+    });
+
+    it('should have live region for selection announcements', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<Chart {...defaultProps} />);
+
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]);
+
+      const liveRegion = container.querySelector('[aria-live="polite"]');
+      expect(liveRegion).toBeInTheDocument();
+      expect(liveRegion?.textContent).toContain('1 seat selected');
+    });
+
+    it('should have assertive live region for max seats reached', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <Chart {...defaultProps} maxSelectableSeats={1} />
+      );
+
+      const buttons = screen.getAllByRole('button');
+      await user.click(buttons[0]); // Select first seat
+      await user.click(buttons[1]); // Try to exceed limit
+
+      const assertiveRegion = container.querySelector('[aria-live="assertive"]');
+      expect(assertiveRegion).toBeInTheDocument();
+      expect(assertiveRegion?.textContent).toContain('Maximum of 1 seats reached');
+    });
+
+    it('should have proper ARIA grid structure: grid > row > gridcell', () => {
+      render(<Chart {...defaultProps} />);
+
+      const grid = screen.getByRole('grid');
+      const rows = grid.querySelectorAll('[role="row"]');
+      expect(rows.length).toBeGreaterThan(0);
+
+      rows.forEach((row) => {
+        const gridcells = row.querySelectorAll('[role="gridcell"]');
+        expect(gridcells.length).toBeGreaterThan(0);
+      });
+    });
+
+    it('should have buttons inside gridcells (not gridcell on button)', () => {
+      render(<Chart {...defaultProps} />);
+
+      const gridcells = screen.getAllByRole('gridcell');
+      gridcells.forEach((gridcell) => {
+        // gridcell should be a div, not a button
+        expect(gridcell.tagName).toBe('DIV');
+        // Should contain a button (for seat cells)
+        const button = gridcell.querySelector('button');
+        if (button) {
+          expect(button.getAttribute('role')).not.toBe('gridcell');
+        }
+      });
+    });
+  });
+
+  describe('Price formatter', () => {
+    it('should use custom priceFormatter in aria-labels', () => {
+      render(
+        <Chart
+          {...defaultProps}
+          priceFormatter={(price) => `₹${price}`}
+        />
+      );
+
+      const buttons = screen.getAllByRole('button');
+      expect(buttons[0]).toHaveAttribute('aria-label', 'Seat 1, available, ₹100');
     });
   });
 });

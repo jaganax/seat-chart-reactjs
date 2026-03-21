@@ -1,4 +1,4 @@
-import { useMemo, useCallback, memo } from "react";
+import { useMemo, useCallback, useState, useRef, useEffect, memo } from "react";
 import type { ChartProps, ParsedCell, SeatStatus, SeatType } from "../../types";
 import { isParsedSeat } from "../../types";
 import { parseSeatMap } from "../../utils/parse-seats";
@@ -35,6 +35,7 @@ export const Chart = memo(function Chart({
   legends,
   disabled = false,
   className,
+  priceFormatter,
 }: ChartProps) {
   // Serialize dependencies to stabilize memoization against inline objects/arrays
   const seatMapsKey = JSON.stringify(seatMaps);
@@ -65,15 +66,97 @@ export const Chart = memo(function Chart({
   const { selectedLabels, toggleSelection } = useSelection({
     onSelectionChange,
     maxSelectableSeats,
-    onMaxSeatsReached,
+    onMaxSeatsReached: (max) => {
+      setMaxReachedMessage(`Maximum of ${max} seats reached. Deselect a seat first.`);
+      onMaxSeatsReached?.(max);
+    },
   });
 
+  // Live region state for screen reader announcements
+  const [maxReachedMessage, setMaxReachedMessage] = useState("");
+  const clearTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  // Clear max reached message after announcement
+  useEffect(() => {
+    if (maxReachedMessage) {
+      clearTimerRef.current = setTimeout(() => setMaxReachedMessage(""), 1000);
+      return () => clearTimeout(clearTimerRef.current);
+    }
+  }, [maxReachedMessage]);
+
   const isMultiLayer = parsedLayers.length > 1;
+  const [activeTab, setActiveTab] = useState(0);
 
   return (
     <div className={cn("w-fit", className)}>
-      <div className={cn("flex gap-4", isMultiLayer ? "flex-row" : "flex-col")}>
-        {parsedLayers.map((layer, layerIndex) => (
+      {isMultiLayer ? (
+        <div className="flex flex-col">
+          {/* Tab list */}
+          <div role="tablist" aria-label="Seat chart layers" className="flex">
+            {parsedLayers.map((layer, index) => (
+              <button
+                key={layer.name || index}
+                type="button"
+                role="tab"
+                id={`seat-chart-tab-${index}`}
+                aria-selected={activeTab === index}
+                aria-controls={`seat-chart-tabpanel-${index}`}
+                tabIndex={activeTab === index ? 0 : -1}
+                className={cn(
+                  "flex-1 px-4 py-2 text-sm font-medium rounded-t-lg border border-b-0 -mb-px transition-colors motion-reduce:transition-none",
+                  activeTab === index
+                    ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 z-10"
+                    : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer"
+                )}
+                onClick={() => setActiveTab(index)}
+                onKeyDown={(e) => {
+                  let nextIndex: number | undefined;
+                  if (e.key === "ArrowRight") {
+                    nextIndex = (index + 1) % parsedLayers.length;
+                  } else if (e.key === "ArrowLeft") {
+                    nextIndex = (index - 1 + parsedLayers.length) % parsedLayers.length;
+                  } else if (e.key === "Home") {
+                    nextIndex = 0;
+                  } else if (e.key === "End") {
+                    nextIndex = parsedLayers.length - 1;
+                  }
+                  if (nextIndex !== undefined) {
+                    e.preventDefault();
+                    setActiveTab(nextIndex);
+                    document.getElementById(`seat-chart-tab-${nextIndex}`)?.focus();
+                  }
+                }}
+              >
+                {layer.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab panels */}
+          {parsedLayers.map((layer, layerIndex) => (
+            <div
+              key={layer.name || layerIndex}
+              role="tabpanel"
+              id={`seat-chart-tabpanel-${layerIndex}`}
+              aria-labelledby={`seat-chart-tab-${layerIndex}`}
+              hidden={activeTab !== layerIndex}
+            >
+              {activeTab === layerIndex && (
+                <ChartLayer
+                  layer={layer}
+                  layerIndex={layerIndex}
+                  selectedLabels={selectedLabels}
+                  onToggle={toggleSelection}
+                  disabled={disabled}
+                  priceFormatter={priceFormatter}
+                  hideHeading
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        parsedLayers.map((layer, layerIndex) => (
           <ChartLayer
             key={layer.name || layerIndex}
             layer={layer}
@@ -81,10 +164,23 @@ export const Chart = memo(function Chart({
             selectedLabels={selectedLabels}
             onToggle={toggleSelection}
             disabled={disabled}
+            priceFormatter={priceFormatter}
           />
-        ))}
-      </div>
+        ))
+      )}
       {legends && <Legend legends={legends} />}
+
+      {/* Live region: selection count */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {selectedLabels.size > 0
+          ? `${selectedLabels.size} seat${selectedLabels.size !== 1 ? "s" : ""} selected`
+          : ""}
+      </div>
+
+      {/* Live region: max seats reached */}
+      <div aria-live="assertive" aria-atomic="true" className="sr-only">
+        {maxReachedMessage}
+      </div>
     </div>
   );
 });
@@ -100,6 +196,9 @@ interface ChartLayerProps {
     status: SeatStatus;
   }) => void;
   disabled: boolean;
+  priceFormatter?: (price: number) => string;
+  /** When true, the layer name heading is suppressed (tabbed layout provides the label) */
+  hideHeading?: boolean;
 }
 
 const ChartLayer = memo(function ChartLayer({
@@ -108,6 +207,8 @@ const ChartLayer = memo(function ChartLayer({
   selectedLabels,
   onToggle,
   disabled,
+  priceFormatter,
+  hideHeading = false,
 }: ChartLayerProps) {
   const { gridRef, handleGridKeyDown } = useGridNavigation();
 
@@ -124,21 +225,33 @@ const ChartLayer = memo(function ChartLayer({
     return { numCols: maxCols, hasBerths };
   }, [layer.seatMap]);
 
+  const showHeading = !hideHeading && !!layer.name;
+  const headingId = showHeading ? `seat-chart-layer-${layerIndex}` : undefined;
+  const instructionsId = `seat-chart-instructions-${layerIndex}`;
+
   // If no berths, use simpler flex layout
   if (!hasBerths) {
     return (
       <div className="flex flex-col">
-        {layer.name && (
-          <div className="text-center text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+        {showHeading && (
+          <h3
+            id={headingId}
+            className="text-center text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+          >
             {layer.name}
-          </div>
+          </h3>
         )}
+        <p id={instructionsId} className="sr-only">
+          Use arrow keys to navigate between seats. Press Enter or Space to select or deselect a seat.
+        </p>
         <div
           ref={gridRef}
           role="grid"
           tabIndex={-1}
-          aria-label={layer.name || "Seat chart"}
-          className="flex flex-col p-2 rounded-lg border border-gray-500 gap-2"
+          aria-labelledby={headingId}
+          aria-label={headingId ? undefined : "Seat chart"}
+          aria-describedby={instructionsId}
+          className={cn("flex flex-col p-2 border border-gray-300 dark:border-gray-600 gap-2", hideHeading ? "rounded-b-lg" : "rounded-lg")}
           onKeyDown={handleGridKeyDown}
         >
           {layer.seatMap.map((row, rowIndex) => (
@@ -150,6 +263,7 @@ const ChartLayer = memo(function ChartLayer({
                   selected={isParsedSeat(cell) && selectedLabels.has(cell.label)}
                   onToggle={onToggle}
                   disabled={disabled}
+                  priceFormatter={priceFormatter}
                 />
               ))}
             </div>
@@ -160,39 +274,48 @@ const ChartLayer = memo(function ChartLayer({
   }
 
   // CSS Grid layout for berths - berths span 2 rows
-  // Each seat map row corresponds to a grid row
-  // Berths span from their row into the next (seat map should use _ for shadow cells)
   return (
     <div className="flex flex-col">
-      {layer.name && (
-        <div className="text-center text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+      {showHeading && (
+        <h3
+          id={headingId}
+          className="text-center text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
+        >
           {layer.name}
-        </div>
+        </h3>
       )}
+      <p id={instructionsId} className="sr-only">
+        Use arrow keys to navigate between seats. Press Enter or Space to select or deselect a seat.
+      </p>
       <div
         ref={gridRef}
         role="grid"
         tabIndex={-1}
-        aria-label={layer.name || "Seat chart"}
-        className="grid p-2 rounded-lg border border-gray-500 gap-2 justify-center"
+        aria-labelledby={headingId}
+        aria-label={headingId ? undefined : "Seat chart"}
+        aria-describedby={instructionsId}
+        className={cn("grid p-2 border border-gray-300 dark:border-gray-600 gap-2 justify-center", hideHeading ? "rounded-b-lg" : "rounded-lg")}
         onKeyDown={handleGridKeyDown}
         style={{
           gridTemplateColumns: `repeat(${numCols}, auto)`,
         }}
       >
-        {layer.seatMap.map((row, rowIndex) =>
-          row.map((cell, colIndex) => (
-            <ChartCell
-              key={`${layerIndex}-${rowIndex}-${colIndex}`}
-              cell={cell}
-              selected={isParsedSeat(cell) && selectedLabels.has(cell.label)}
-              onToggle={onToggle}
-              disabled={disabled}
-              gridRow={rowIndex + 1}
-              gridCol={colIndex + 1}
-            />
-          ))
-        )}
+        {layer.seatMap.map((row, rowIndex) => (
+          <div key={rowIndex} role="row" style={{ display: "contents" }}>
+            {row.map((cell, colIndex) => (
+              <ChartCell
+                key={`${layerIndex}-${rowIndex}-${colIndex}`}
+                cell={cell}
+                selected={isParsedSeat(cell) && selectedLabels.has(cell.label)}
+                onToggle={onToggle}
+                disabled={disabled}
+                gridRow={rowIndex + 1}
+                gridCol={colIndex + 1}
+                priceFormatter={priceFormatter}
+              />
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -210,6 +333,7 @@ interface ChartCellProps {
   disabled: boolean;
   gridRow?: number;
   gridCol?: number;
+  priceFormatter?: (price: number) => string;
 }
 
 const ChartCell = memo(function ChartCell({
@@ -219,6 +343,7 @@ const ChartCell = memo(function ChartCell({
   disabled,
   gridRow,
   gridCol,
+  priceFormatter,
 }: ChartCellProps) {
   const handleClick = useCallback(() => {
     if (isParsedSeat(cell)) {
@@ -236,7 +361,7 @@ const ChartCell = memo(function ChartCell({
 
   if (isParsedSeat(cell)) {
     return (
-      <div role="row" style={gridStyle}>
+      <div style={gridStyle}>
         <SeatButton
           type={cell.type}
           label={cell.label}
@@ -245,13 +370,14 @@ const ChartCell = memo(function ChartCell({
           isSelected={selected}
           disabled={disabled}
           onClick={handleClick}
+          priceFormatter={priceFormatter}
         />
       </div>
     );
   }
 
   return (
-    <div role="row" style={gridStyle}>
+    <div style={gridStyle}>
       <LayoutCell type={cell.type} />
     </div>
   );

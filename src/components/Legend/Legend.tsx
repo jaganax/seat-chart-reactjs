@@ -4,11 +4,12 @@ import { SeatButton } from "../SeatButton";
 
 /**
  * Legend component showing seat status colors and their meanings.
+ * Renders in a 2-column grid with compact seat swatches.
  */
 export const Legend = memo(function Legend({ legends }: LegendProps) {
   return (
     <div
-      className="flex flex-col p-2 gap-2"
+      className="grid grid-cols-2 p-2 gap-x-4 gap-y-1.5"
       role="list"
       aria-label="Seat status legend"
     >
@@ -31,18 +32,21 @@ const LegendRow = memo(function LegendRow({ legend }: LegendRowProps) {
 
   return (
     <div
-      className="flex items-center justify-between gap-2"
+      className="flex items-center gap-1.5"
       role="listitem"
     >
-      <SeatButton
-        type={type}
-        label=""
-        price={0}
-        status={status}
-        isSelected={isSelected}
-        disabled
-      />
-      <div className="text-sm capitalize">{legend.status}</div>
+      <div className="scale-75 origin-left">
+        <SeatButton
+          type={type}
+          label=""
+          price={0}
+          status={status}
+          isSelected={isSelected}
+          disabled
+          decorative
+        />
+      </div>
+      <div className="text-xs capitalize text-gray-700 dark:text-gray-300">{legend.status}</div>
     </div>
   );
 });

@@ -58,7 +58,6 @@ describe('Legend Component', () => {
     it('should render seat type by default', () => {
       const legends: LegendItem[] = [{ status: 'available' }];
       const { container } = render(<Legend legends={legends} />);
-      // SeatIcon should be rendered (not BerthIcon)
       const svg = container.querySelector('svg');
       expect(svg).toBeInTheDocument();
     });
@@ -67,8 +66,8 @@ describe('Legend Component', () => {
       const legends: LegendItem[] = [{ status: 'available', type: 'berth' }];
       const { container } = render(<Legend legends={legends} />);
       const button = container.querySelector('button');
-      // Berth has different height class
-      expect(button?.className).toContain('h-[4.5rem]');
+      // Berth has h-[5.5rem] which is different from seat size
+      expect(button?.className).toContain('h-[5.5rem]');
     });
 
     it('should render mixed types', () => {
@@ -83,20 +82,36 @@ describe('Legend Component', () => {
   });
 
   describe('Selected status handling', () => {
-    it('should show selected button with isSelected=true for "selected" status', () => {
+    it('should show selected button with blue fill for "selected" status', () => {
       const legends: LegendItem[] = [{ status: 'selected' }];
       const { container } = render(<Legend legends={legends} />);
       const button = container.querySelector('button');
-      // Selected uses blue color
       expect(button?.className).toContain('bg-blue-500');
     });
 
-    it('should show non-selected buttons for other statuses', () => {
+    it('should show available styles (green) for available status', () => {
       const legends: LegendItem[] = [{ status: 'available' }];
       const { container } = render(<Legend legends={legends} />);
       const button = container.querySelector('button');
-      // Available uses green color
       expect(button?.className).toContain('bg-green-500');
+    });
+  });
+
+  describe('Decorative mode', () => {
+    it('should render legend seat buttons as decorative (no gridcell role)', () => {
+      const legends: LegendItem[] = [
+        { status: 'available' },
+        { status: 'booked' },
+      ];
+      render(<Legend legends={legends} />);
+      expect(screen.queryAllByRole('gridcell')).toHaveLength(0);
+    });
+
+    it('should have aria-hidden wrapper for decorative buttons', () => {
+      const legends: LegendItem[] = [{ status: 'available' }];
+      const { container } = render(<Legend legends={legends} />);
+      const ariaHiddenDivs = container.querySelectorAll('[aria-hidden="true"]');
+      expect(ariaHiddenDivs.length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -128,7 +143,6 @@ describe('Legend Component', () => {
       render(<Legend legends={legends} />);
       const listitem = screen.getByRole('listitem');
 
-      // Check that the listitem contains both button and text
       expect(listitem.querySelector('button')).toBeInTheDocument();
       expect(listitem).toHaveTextContent('available');
     });
@@ -150,6 +164,14 @@ describe('Legend Component', () => {
       items.forEach(item => {
         expect(list).toContainElement(item);
       });
+    });
+
+    it('should have explicit text color for legend labels', () => {
+      const legends: LegendItem[] = [{ status: 'available' }];
+      const { container } = render(<Legend legends={legends} />);
+      const textEl = container.querySelector('.text-sm.capitalize');
+      expect(textEl?.className).toContain('text-gray-700');
+      expect(textEl?.className).toContain('dark:text-gray-300');
     });
   });
 });

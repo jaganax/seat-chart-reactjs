@@ -38,9 +38,9 @@ All tests use Vitest, configured as two projects in `vite.config.ts`:
 
 Chart.tsx contains three memo'd components in a single file:
 
-- **Chart** — Parses seat maps via `parseSeatMap()`, manages selection via `useSelection()`, renders layers
-- **ChartLayer** — Renders a single layer (deck). Uses flex layout for seats-only, CSS Grid for berths (`grid-row: span 2`). Integrates `useGridNavigation()` for arrow key support.
-- **ChartCell** — Renders individual cell: delegates to `SeatButton` for seats/berths or `LayoutCell` for driver/door/space
+- **Chart** — Parses seat maps via `parseSeatMap()`, manages selection via `useSelection()`, renders layers. Includes `aria-live` regions for selection count and max-seats-reached announcements.
+- **ChartLayer** — Renders a single layer (deck). Uses flex layout for seats-only, CSS Grid for berths (`grid-row: span 2` with `display: contents` row wrappers). Integrates `useGridNavigation()` for arrow key support. Layer names render as `<h3>` headings linked via `aria-labelledby`.
+- **ChartCell** — Renders individual cell: delegates to `SeatButton` for seats/berths or `LayoutCell` for driver/door/space. No ARIA roles on ChartCell itself — roles live in child components.
 
 ### Re-render Optimization Pattern
 
@@ -51,7 +51,7 @@ Selection uses a `useReducer` + `useRef` pattern in `useSelection.ts` to keep `t
 ### Hooks
 
 - `src/hooks/useSelection.ts` — Selection state with `useReducer`, O(1) Set lookup, stable callbacks via `useRef`
-- `src/hooks/useGridNavigation.ts` — WAI-ARIA arrow key navigation between interactive gridcells. ArrowLeft/Right by index, ArrowUp/Down by spatial position via `getBoundingClientRect`.
+- `src/hooks/useGridNavigation.ts` — WAI-ARIA arrow key navigation between all gridcells (including non-interactive). Roving tabindex pattern: only one cell has `tabIndex={0}`, arrow keys move focus and update tabindex. ArrowLeft/Right by index, ArrowUp/Down by spatial position via `getBoundingClientRect`.
 
 ### Types
 
@@ -66,7 +66,7 @@ Selection uses a `useReducer` + `useRef` pattern in `useSelection.ts` to keep `t
 
 ### Styling
 
-Tailwind CSS v4 via `@tailwindcss/vite`. Status colors defined as constants in `SeatButton.tsx`: green (available), gray (booked), amber (blocked), blue (selected).
+Tailwind CSS v4 via `@tailwindcss/vite`. Status colors use WCAG AA-compliant darker shades in `SeatButton.tsx`: green-700 (available), gray-500 (booked), amber-700 (blocked), blue-700 (selected). Touch targets are `size-10` (40px).
 
 ### Build
 
@@ -79,8 +79,24 @@ Vite library mode. React and Tailwind are external peer dependencies. `vite-plug
 
 ## Accessibility
 
-- WAI-ARIA grid pattern: `role="grid"` → `role="row"` → `role="gridcell"`
-- `aria-selected` for selection state, `aria-disabled` for booked/blocked seats
-- `aria-label` with seat info (e.g., "Seat R1, available, $100")
-- Keyboard: Tab, Enter, Space for selection; Arrow keys for grid navigation
+### ARIA Grid Pattern
+- Proper hierarchy: `role="grid"` → `role="row"` → `role="gridcell"` → `<button>` (gridcell is a wrapper div, not on the button)
+- `aria-selected` on the gridcell wrapper, `aria-disabled` and `aria-label` on the button inside
+- SeatButton has a `decorative` prop that suppresses grid ARIA roles (used in Legend)
+- All gridcells (including layout cells) have `tabIndex={-1}` for programmatic focusability
+- Space cells use `aria-label="Empty"` instead of `aria-hidden` to preserve grid column numbering
+
+### Keyboard Navigation
+- Roving tabindex: only one cell has `tabIndex={0}`, Tab enters/exits the grid, arrow keys navigate
+- Enter/Space for selection
+- `aria-describedby` links to sr-only instructions explaining keyboard controls
+
+### Screen Reader Support
+- `aria-live="polite"` region announces selection count changes
+- `aria-live="assertive"` region announces when max seat limit is reached
+- Layer names are `<h3>` headings linked to grids via `aria-labelledby`
+- `priceFormatter` prop allows locale-appropriate price formatting in aria-labels (default: `$<price>`)
+- `motion-reduce:transition-none` on interactive elements
+
+### Tooling
 - ESLint jsx-a11y plugin enforces accessibility rules at lint time
