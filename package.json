@@ -44,7 +44,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
-    "branchlint": "branch-name-lint",
+    "branchlint": "branch-name-lint .branchlintrc.json",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "changeset publish",
