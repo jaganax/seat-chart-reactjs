@@ -1,9 +1,9 @@
 // Seat statuses
-export type SeatStatus = "available" | "booked" | "blocked";
+export type SeatStatus = 'available' | 'booked' | 'blocked';
 
 // Cell types
-export type SeatType = "seat" | "berth";
-export type LayoutType = "driver" | "door" | "space";
+export type SeatType = 'seat' | 'berth';
+export type LayoutType = 'driver' | 'door' | 'space';
 export type CellType = SeatType | LayoutType;
 
 // Parsed cell data
@@ -22,11 +22,11 @@ export type ParsedCell = ParsedSeat | ParsedLayoutCell;
 
 // Type guards
 export function isParsedSeat(cell: ParsedCell): cell is ParsedSeat {
-  return cell.type === "seat" || cell.type === "berth";
+  return cell.type === 'seat' || cell.type === 'berth';
 }
 
 export function isLayoutCell(cell: ParsedCell): cell is ParsedLayoutCell {
-  return cell.type === "driver" || cell.type === "door" || cell.type === "space";
+  return cell.type === 'driver' || cell.type === 'door' || cell.type === 'space';
 }
 
 // Selection
@@ -44,7 +44,7 @@ export interface SeatTypeConfig {
 }
 
 export interface LegendItem {
-  status: SeatStatus | "selected";
+  status: SeatStatus | 'selected';
   type?: SeatType;
 }
 

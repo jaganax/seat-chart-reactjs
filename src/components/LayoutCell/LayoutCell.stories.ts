@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { LayoutCell } from "./LayoutCell";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { LayoutCell } from './LayoutCell';
 
 const meta: Meta<typeof LayoutCell> = {
-  title: "Components/LayoutCell",
+  title: 'Components/LayoutCell',
   component: LayoutCell,
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   argTypes: {
     type: {
-      control: "select",
-      options: ["driver", "door", "space"],
+      control: 'select',
+      options: ['driver', 'door', 'space'],
     },
   },
 } satisfies Meta<typeof LayoutCell>;
@@ -19,18 +19,18 @@ type Story = StoryObj<typeof meta>;
 
 export const Driver: Story = {
   args: {
-    type: "driver",
+    type: 'driver',
   },
 };
 
 export const Door: Story = {
   args: {
-    type: "door",
+    type: 'door',
   },
 };
 
 export const Space: Story = {
   args: {
-    type: "space",
+    type: 'space',
   },
 };

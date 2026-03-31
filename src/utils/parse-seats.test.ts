@@ -212,13 +212,7 @@ describe('parseSeatMap', () => {
 
   describe('Mixed layouts', () => {
     it('should parse a realistic bus seat map', () => {
-      const seatMap = [
-        'd__o',
-        'aa_a',
-        'aa_a',
-        'aa_a',
-        'aaaa',
-      ];
+      const seatMap = ['d__o', 'aa_a', 'aa_a', 'aa_a', 'aaaa'];
       const result = parseSeatMap(seatMap, basicSeatTypes);
 
       // First row: driver, space, space, door

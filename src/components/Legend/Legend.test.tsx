@@ -99,10 +99,7 @@ describe('Legend Component', () => {
 
   describe('Decorative mode', () => {
     it('should render legend seat buttons as decorative (no gridcell role)', () => {
-      const legends: LegendItem[] = [
-        { status: 'available' },
-        { status: 'booked' },
-      ];
+      const legends: LegendItem[] = [{ status: 'available' }, { status: 'booked' }];
       render(<Legend legends={legends} />);
       expect(screen.queryAllByRole('gridcell')).toHaveLength(0);
     });
@@ -117,10 +114,7 @@ describe('Legend Component', () => {
 
   describe('Disabled state', () => {
     it('should render all legend seat buttons as disabled', () => {
-      const legends: LegendItem[] = [
-        { status: 'available' },
-        { status: 'booked' },
-      ];
+      const legends: LegendItem[] = [{ status: 'available' }, { status: 'booked' }];
       const { container } = render(<Legend legends={legends} />);
       const buttons = container.querySelectorAll('button');
       buttons.forEach((button) => {
@@ -150,10 +144,7 @@ describe('Legend Component', () => {
 
   describe('Accessibility', () => {
     it('should have proper list structure', () => {
-      const legends: LegendItem[] = [
-        { status: 'available' },
-        { status: 'booked' },
-      ];
+      const legends: LegendItem[] = [{ status: 'available' }, { status: 'booked' }];
       render(<Legend legends={legends} />);
 
       const list = screen.getByRole('list');
@@ -161,7 +152,7 @@ describe('Legend Component', () => {
 
       expect(list).toBeInTheDocument();
       expect(items).toHaveLength(2);
-      items.forEach(item => {
+      items.forEach((item) => {
         expect(list).toContainElement(item);
       });
     });

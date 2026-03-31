@@ -27,6 +27,23 @@ function TestGrid({ disabledIndices = [] as number[] }) {
   );
 }
 
+function TestGridWithLayoutCells() {
+  const { gridRef, handleGridKeyDown } = useGridNavigation();
+
+  return (
+    <div ref={gridRef} role="grid" tabIndex={-1} onKeyDown={handleGridKeyDown}>
+      <div role="row">
+        <div role="gridcell" tabIndex={-1} aria-label="Empty">
+          {/* Layout cell — no button inside, gridcell itself is focusable */}
+        </div>
+        <div role="gridcell">
+          <button>1</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 describe('useGridNavigation', () => {
   it('should move focus right with ArrowRight', () => {
     render(<TestGrid />);
@@ -90,16 +107,48 @@ describe('useGridNavigation', () => {
 
     // Mock getBoundingClientRect on the buttons (focusable elements inside gridcells)
     vi.spyOn(buttons[0], 'getBoundingClientRect').mockReturnValue({
-      top: 0, left: 0, width: 32, height: 32, bottom: 32, right: 32, x: 0, y: 0, toJSON: () => {},
+      top: 0,
+      left: 0,
+      width: 32,
+      height: 32,
+      bottom: 32,
+      right: 32,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[1], 'getBoundingClientRect').mockReturnValue({
-      top: 0, left: 40, width: 32, height: 32, bottom: 32, right: 72, x: 40, y: 0, toJSON: () => {},
+      top: 0,
+      left: 40,
+      width: 32,
+      height: 32,
+      bottom: 32,
+      right: 72,
+      x: 40,
+      y: 0,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[2], 'getBoundingClientRect').mockReturnValue({
-      top: 40, left: 0, width: 32, height: 32, bottom: 72, right: 32, x: 0, y: 40, toJSON: () => {},
+      top: 40,
+      left: 0,
+      width: 32,
+      height: 32,
+      bottom: 72,
+      right: 32,
+      x: 0,
+      y: 40,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[3], 'getBoundingClientRect').mockReturnValue({
-      top: 40, left: 40, width: 32, height: 32, bottom: 72, right: 72, x: 40, y: 40, toJSON: () => {},
+      top: 40,
+      left: 40,
+      width: 32,
+      height: 32,
+      bottom: 72,
+      right: 72,
+      x: 40,
+      y: 40,
+      toJSON: () => {},
     });
 
     buttons[0].focus();
@@ -112,16 +161,48 @@ describe('useGridNavigation', () => {
     const buttons = screen.getAllByRole('button');
 
     vi.spyOn(buttons[0], 'getBoundingClientRect').mockReturnValue({
-      top: 0, left: 0, width: 32, height: 32, bottom: 32, right: 32, x: 0, y: 0, toJSON: () => {},
+      top: 0,
+      left: 0,
+      width: 32,
+      height: 32,
+      bottom: 32,
+      right: 32,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[1], 'getBoundingClientRect').mockReturnValue({
-      top: 0, left: 40, width: 32, height: 32, bottom: 32, right: 72, x: 40, y: 0, toJSON: () => {},
+      top: 0,
+      left: 40,
+      width: 32,
+      height: 32,
+      bottom: 32,
+      right: 72,
+      x: 40,
+      y: 0,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[2], 'getBoundingClientRect').mockReturnValue({
-      top: 40, left: 0, width: 32, height: 32, bottom: 72, right: 32, x: 0, y: 40, toJSON: () => {},
+      top: 40,
+      left: 0,
+      width: 32,
+      height: 32,
+      bottom: 72,
+      right: 32,
+      x: 0,
+      y: 40,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[3], 'getBoundingClientRect').mockReturnValue({
-      top: 40, left: 40, width: 32, height: 32, bottom: 72, right: 72, x: 40, y: 40, toJSON: () => {},
+      top: 40,
+      left: 40,
+      width: 32,
+      height: 32,
+      bottom: 72,
+      right: 72,
+      x: 40,
+      y: 40,
+      toJSON: () => {},
     });
 
     buttons[3].focus();
@@ -134,21 +215,67 @@ describe('useGridNavigation', () => {
     const buttons = screen.getAllByRole('button');
 
     vi.spyOn(buttons[0], 'getBoundingClientRect').mockReturnValue({
-      top: 0, left: 0, width: 32, height: 32, bottom: 32, right: 32, x: 0, y: 0, toJSON: () => {},
+      top: 0,
+      left: 0,
+      width: 32,
+      height: 32,
+      bottom: 32,
+      right: 32,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[1], 'getBoundingClientRect').mockReturnValue({
-      top: 0, left: 40, width: 32, height: 32, bottom: 32, right: 72, x: 40, y: 0, toJSON: () => {},
+      top: 0,
+      left: 40,
+      width: 32,
+      height: 32,
+      bottom: 32,
+      right: 72,
+      x: 40,
+      y: 0,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[2], 'getBoundingClientRect').mockReturnValue({
-      top: 40, left: 0, width: 32, height: 32, bottom: 72, right: 32, x: 0, y: 40, toJSON: () => {},
+      top: 40,
+      left: 0,
+      width: 32,
+      height: 32,
+      bottom: 72,
+      right: 32,
+      x: 0,
+      y: 40,
+      toJSON: () => {},
     });
     vi.spyOn(buttons[3], 'getBoundingClientRect').mockReturnValue({
-      top: 40, left: 40, width: 32, height: 32, bottom: 72, right: 72, x: 40, y: 40, toJSON: () => {},
+      top: 40,
+      left: 40,
+      width: 32,
+      height: 32,
+      bottom: 72,
+      right: 72,
+      x: 40,
+      y: 40,
+      toJSON: () => {},
     });
 
     buttons[0].focus();
     fireEvent.keyDown(buttons[0], { key: 'ArrowUp' });
     expect(document.activeElement).toBe(buttons[0]);
+  });
+
+  it('should navigate when focus is directly on a gridcell (layout cell without button)', () => {
+    render(<TestGridWithLayoutCells />);
+    const gridcells = screen.getAllByRole('gridcell');
+    const layoutCell = gridcells[0]; // No button inside
+    const button = screen.getByRole('button'); // Button in second gridcell
+
+    // Focus the layout cell directly (it has role="gridcell")
+    layoutCell.focus();
+    expect(document.activeElement).toBe(layoutCell);
+
+    fireEvent.keyDown(layoutCell, { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(button);
   });
 
   it('should implement roving tabindex on arrow navigation', () => {

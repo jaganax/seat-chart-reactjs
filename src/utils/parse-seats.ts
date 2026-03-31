@@ -4,7 +4,7 @@ import type {
   ParsedLayoutCell,
   SeatStatus,
   SeatTypeConfig,
-} from "../types";
+} from '../types';
 
 export type ParsedSeatMap = ParsedCell[][];
 
@@ -28,7 +28,7 @@ export function parseSeatMap(
   seatTypes: Record<string, SeatTypeConfig>,
   bookedSeats: string[] = [],
   blockedSeats: string[] = [],
-  startIndex: number = 0
+  startIndex: number = 0,
 ): ParseSeatMapResult {
   const parsedSeatMap: ParsedSeatMap = [];
   let seatIndex = startIndex;
@@ -44,16 +44,15 @@ export function parseSeatMap(
 
     for (let colIndex = 0; colIndex < matches.length; colIndex++) {
       const seat = matches[colIndex];
-      const seatDataPattern =
-        /([a-z_])(?:\[([0-9a-z_]+)(?:,([0-9a-z_ ]+))?\])?/i;
+      const seatDataPattern = /([a-z_])(?:\[([0-9a-z_]+)(?:,([0-9a-z_ ]+))?\])?/i;
       const seatData = seat.match(seatDataPattern);
 
       if (seatData) {
         const char = seatData[1];
         const config = seatTypes[char];
-        const type = config?.type ?? "space";
+        const type = config?.type ?? 'space';
 
-        if (type === "seat" || type === "berth") {
+        if (type === 'seat' || type === 'berth') {
           const label = seatData[3]?.trim() ?? String(++seatIndex);
           const status = getStatus(label, bookedSet, blockedSet);
 
@@ -77,12 +76,8 @@ export function parseSeatMap(
   return { seatMap: parsedSeatMap, nextIndex: seatIndex };
 }
 
-function getStatus(
-  label: string,
-  bookedSet: Set<string>,
-  blockedSet: Set<string>
-): SeatStatus {
-  if (bookedSet.has(label)) return "booked";
-  if (blockedSet.has(label)) return "blocked";
-  return "available";
+function getStatus(label: string, bookedSet: Set<string>, blockedSet: Set<string>): SeatStatus {
+  if (bookedSet.has(label)) return 'booked';
+  if (blockedSet.has(label)) return 'blocked';
+  return 'available';
 }
