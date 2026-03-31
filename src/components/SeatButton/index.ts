@@ -1,1 +1,1 @@
-export { SeatButton } from "./SeatButton";
+export { SeatButton } from './SeatButton';

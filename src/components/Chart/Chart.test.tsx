@@ -114,7 +114,7 @@ describe('Chart Component', () => {
           maxSelectableSeats={2}
           onSelectionChange={onSelectionChange}
           onMaxSeatsReached={onMaxSeatsReached}
-        />
+        />,
       );
 
       const buttons = screen.getAllByRole('button');
@@ -136,13 +136,7 @@ describe('Chart Component', () => {
       const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
-      render(
-        <Chart
-          {...defaultProps}
-          bookedSeats={['1']}
-          onSelectionChange={onSelectionChange}
-        />
-      );
+      render(<Chart {...defaultProps} bookedSeats={['1']} onSelectionChange={onSelectionChange} />);
 
       const buttons = screen.getAllByRole('button');
       await user.click(buttons[0]); // Seat 1 is booked
@@ -155,11 +149,7 @@ describe('Chart Component', () => {
       const user = userEvent.setup();
 
       render(
-        <Chart
-          {...defaultProps}
-          blockedSeats={['2']}
-          onSelectionChange={onSelectionChange}
-        />
+        <Chart {...defaultProps} blockedSeats={['2']} onSelectionChange={onSelectionChange} />,
       );
 
       const buttons = screen.getAllByRole('button');
@@ -181,9 +171,7 @@ describe('Chart Component', () => {
       const onSelectionChange = vi.fn();
       const user = userEvent.setup();
 
-      render(
-        <Chart {...defaultProps} disabled onSelectionChange={onSelectionChange} />
-      );
+      render(<Chart {...defaultProps} disabled onSelectionChange={onSelectionChange} />);
 
       const buttons = screen.getAllByRole('button');
       await user.click(buttons[0]);
@@ -207,9 +195,7 @@ describe('Chart Component', () => {
 
     it('should render space as accessible with aria-label', () => {
       const seatMapWithSpace = ['a_a'];
-      render(
-        <Chart {...defaultProps} seatMaps={seatMapWithSpace} />
-      );
+      render(<Chart {...defaultProps} seatMaps={seatMapWithSpace} />);
 
       expect(screen.getByLabelText('Empty')).toBeInTheDocument();
     });
@@ -321,7 +307,7 @@ describe('Chart Component', () => {
           {...defaultProps}
           seatMaps={multiLayerSeatMaps}
           onSelectionChange={onSelectionChange}
-        />
+        />,
       );
 
       // Switch to Upper Deck
@@ -330,12 +316,10 @@ describe('Chart Component', () => {
 
       const buttons = screen.getAllByRole('button');
       // Filter out tab buttons — seat buttons have aria-label
-      const seatButtons = buttons.filter(b => b.getAttribute('aria-label')?.match(/Seat|Berth/));
+      const seatButtons = buttons.filter((b) => b.getAttribute('aria-label')?.match(/Seat|Berth/));
       await user.click(seatButtons[0]); // Should be seat 3
 
-      expect(onSelectionChange).toHaveBeenCalledWith([
-        expect.objectContaining({ label: '3' }),
-      ]);
+      expect(onSelectionChange).toHaveBeenCalledWith([expect.objectContaining({ label: '3' })]);
     });
 
     it('should preserve selection when switching tabs', async () => {
@@ -347,11 +331,13 @@ describe('Chart Component', () => {
           {...defaultProps}
           seatMaps={multiLayerSeatMaps}
           onSelectionChange={onSelectionChange}
-        />
+        />,
       );
 
       // Select seat on Lower Deck
-      const seatButtons = screen.getAllByRole('button').filter(b => b.getAttribute('aria-label')?.match(/Seat/));
+      const seatButtons = screen
+        .getAllByRole('button')
+        .filter((b) => b.getAttribute('aria-label')?.match(/Seat/));
       await user.click(seatButtons[0]);
 
       // Switch to Upper Deck and back
@@ -386,11 +372,7 @@ describe('Chart Component', () => {
       const user = userEvent.setup();
 
       render(
-        <Chart
-          {...defaultProps}
-          seatMaps={berthSeatMap}
-          onSelectionChange={onSelectionChange}
-        />
+        <Chart {...defaultProps} seatMaps={berthSeatMap} onSelectionChange={onSelectionChange} />,
       );
 
       const buttons = screen.getAllByRole('button');
@@ -404,10 +386,7 @@ describe('Chart Component', () => {
 
   describe('Legend', () => {
     it('should render legend when provided', () => {
-      const legends: LegendItem[] = [
-        { status: 'available' },
-        { status: 'booked' },
-      ];
+      const legends: LegendItem[] = [{ status: 'available' }, { status: 'booked' }];
 
       render(<Chart {...defaultProps} legends={legends} />);
 
@@ -432,7 +411,7 @@ describe('Chart Component', () => {
           {...defaultProps}
           seatMaps={customLabelSeatMap}
           onSelectionChange={onSelectionChange}
-        />
+        />,
       );
 
       expect(screen.getByLabelText(/Seat R1/)).toBeInTheDocument();
@@ -441,9 +420,7 @@ describe('Chart Component', () => {
       const buttons = screen.getAllByRole('button');
       await user.click(buttons[0]);
 
-      expect(onSelectionChange).toHaveBeenCalledWith([
-        expect.objectContaining({ label: 'R1' }),
-      ]);
+      expect(onSelectionChange).toHaveBeenCalledWith([expect.objectContaining({ label: 'R1' })]);
     });
   });
 
@@ -518,12 +495,7 @@ describe('Chart Component', () => {
 
   describe('Realistic bus layout', () => {
     it('should render a complete bus seat layout', () => {
-      const busLayout = [
-        'd__o',
-        'aa_a',
-        'aa_a',
-        'aaaa',
-      ];
+      const busLayout = ['d__o', 'aa_a', 'aa_a', 'aaaa'];
 
       render(<Chart {...defaultProps} seatMaps={busLayout} />);
 
@@ -563,9 +535,7 @@ describe('Chart Component', () => {
 
     it('should have assertive live region for max seats reached', async () => {
       const user = userEvent.setup();
-      const { container } = render(
-        <Chart {...defaultProps} maxSelectableSeats={1} />
-      );
+      const { container } = render(<Chart {...defaultProps} maxSelectableSeats={1} />);
 
       const buttons = screen.getAllByRole('button');
       await user.click(buttons[0]); // Select first seat
@@ -605,14 +575,59 @@ describe('Chart Component', () => {
     });
   });
 
+  describe('Multi-layer berth support', () => {
+    const multiLayerBerthMaps = {
+      'Lower Deck': ['ab', 'aa'],
+      'Upper Deck': ['bb'],
+    };
+
+    it('should render berth grid layout within a tabbed multi-layer view', async () => {
+      const user = userEvent.setup();
+      render(<Chart {...defaultProps} seatMaps={multiLayerBerthMaps} />);
+
+      // Switch to Upper Deck (berths only)
+      const tabs = screen.getAllByRole('tab');
+      await user.click(tabs[1]);
+
+      const grid = screen.getByRole('grid');
+      expect(grid).toHaveAttribute('aria-label', 'Seat chart');
+      // hideHeading is true in tabbed layout — should have rounded-b-lg
+      expect(grid.className).toContain('rounded-b-lg');
+    });
+
+    it('should render mixed seat and berth in grid layout with correct grid-row span', () => {
+      // Single named layer with both seats and berths triggers grid layout
+      const mixedSeatMap = ['ab'];
+      render(<Chart {...defaultProps} seatMaps={mixedSeatMap} />);
+
+      const grid = screen.getByRole('grid');
+      expect(grid).toBeInTheDocument();
+
+      // The berth cell should have grid-row span 2
+      const gridcells = screen.getAllByRole('gridcell');
+      const berthCell = gridcells.find((gc) => gc.querySelector('[aria-label*="Berth"]'));
+      expect(berthCell?.parentElement?.style.gridRow).toContain('span 2');
+    });
+
+    it('should render named single layer with heading in berth grid layout', () => {
+      const namedBerthMap = { 'Sleeper Deck': ['ab'] };
+      render(<Chart {...defaultProps} seatMaps={namedBerthMap} />);
+
+      // Single named layer — no tabs, heading shown
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+      const heading = screen.getByRole('heading', { name: 'Sleeper Deck' });
+      expect(heading).toBeInTheDocument();
+
+      // Grid should use aria-labelledby (not aria-label) since heading exists
+      const grid = screen.getByRole('grid');
+      expect(grid).toHaveAttribute('aria-labelledby', heading.id);
+      expect(grid).not.toHaveAttribute('aria-label');
+    });
+  });
+
   describe('Price formatter', () => {
     it('should use custom priceFormatter in aria-labels', () => {
-      render(
-        <Chart
-          {...defaultProps}
-          priceFormatter={(price) => `₹${price}`}
-        />
-      );
+      render(<Chart {...defaultProps} priceFormatter={(price) => `₹${price}`} />);
 
       const buttons = screen.getAllByRole('button');
       expect(buttons[0]).toHaveAttribute('aria-label', 'Seat 1, available, ₹100');

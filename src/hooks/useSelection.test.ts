@@ -97,7 +97,7 @@ describe('useSelection hook', () => {
           onSelectionChange,
           maxSelectableSeats: 2,
           onMaxSeatsReached,
-        })
+        }),
       );
 
       act(() => {
@@ -117,9 +117,7 @@ describe('useSelection hook', () => {
     });
 
     it('should allow selection after deselecting when at max', () => {
-      const { result } = renderHook(() =>
-        useSelection({ maxSelectableSeats: 2 })
-      );
+      const { result } = renderHook(() => useSelection({ maxSelectableSeats: 2 }));
 
       act(() => {
         result.current.toggleSelection(mockSeat);
@@ -146,7 +144,7 @@ describe('useSelection hook', () => {
     it('should work with maxSelectableSeats of 1', () => {
       const onMaxSeatsReached = vi.fn();
       const { result } = renderHook(() =>
-        useSelection({ maxSelectableSeats: 1, onMaxSeatsReached })
+        useSelection({ maxSelectableSeats: 1, onMaxSeatsReached }),
       );
 
       act(() => {
@@ -190,7 +188,7 @@ describe('useSelection hook', () => {
     it('should not call onMaxSeatsReached when under limit', () => {
       const onMaxSeatsReached = vi.fn();
       const { result } = renderHook(() =>
-        useSelection({ maxSelectableSeats: 3, onMaxSeatsReached })
+        useSelection({ maxSelectableSeats: 3, onMaxSeatsReached }),
       );
 
       act(() => {

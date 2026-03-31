@@ -1,5 +1,5 @@
-import { memo } from "react";
-import type { LayoutType } from "../../types";
+import { memo } from 'react';
+import type { LayoutType } from '../../types';
 
 interface LayoutCellProps {
   type: LayoutType;
@@ -11,7 +11,7 @@ interface LayoutCellProps {
  */
 export const LayoutCell = memo(function LayoutCell({ type }: LayoutCellProps) {
   switch (type) {
-    case "driver":
+    case 'driver':
       return (
         <div
           className="size-10 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 dark:focus:ring-offset-gray-900 rounded-sm"
@@ -19,7 +19,12 @@ export const LayoutCell = memo(function LayoutCell({ type }: LayoutCellProps) {
           aria-label="Driver position"
           tabIndex={-1}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="size-7 text-gray-600 dark:text-gray-300" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 64 64"
+            className="size-7 text-gray-600 dark:text-gray-300"
+            aria-hidden="true"
+          >
             <g fill="currentColor">
               <path d="M32,61A29,29,0,1,1,61,32,29,29,0,0,1,32,61ZM32,5A27,27,0,1,0,59,32,27,27,0,0,0,32,5Zm0,37.8a10.79,10.79,0,1,1,5.5-1.5h0A10.73,10.73,0,0,1,32,42.8Zm0-19.6a8.82,8.82,0,0,0-7.62,4.4A8.62,8.62,0,0,0,23.2,32a8.79,8.79,0,0,0,4.33,7.58,8.83,8.83,0,0,0,8.95,0h0A8.8,8.8,0,0,0,32,23.2Z" />
               <path d="M32,55.4c-.22,0-.44,0-.66,0a23.39,23.39,0,1,1,1.27,0Zm0-2h.52a21.42,21.42,0,1,0-1.08,0Zm0-10.6a10.79,10.79,0,1,1,5.5-1.5h0A10.73,10.73,0,0,1,32,42.8Zm0-19.6a8.82,8.82,0,0,0-7.62,4.4A8.62,8.62,0,0,0,23.2,32a8.79,8.79,0,0,0,4.33,7.58,8.83,8.83,0,0,0,8.95,0h0A8.8,8.8,0,0,0,32,23.2Z" />
@@ -32,7 +37,7 @@ export const LayoutCell = memo(function LayoutCell({ type }: LayoutCellProps) {
         </div>
       );
 
-    case "door":
+    case 'door':
       return (
         <div
           className="size-10 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 dark:focus:ring-offset-gray-900 rounded-sm"
@@ -40,7 +45,12 @@ export const LayoutCell = memo(function LayoutCell({ type }: LayoutCellProps) {
           aria-label="Door"
           tabIndex={-1}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className="size-7 text-gray-600 dark:text-gray-300" aria-hidden="true">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 100"
+            className="size-7 text-gray-600 dark:text-gray-300"
+            aria-hidden="true"
+          >
             <g fill="currentColor">
               <path d="m76 58h-12c-1.1016 0-2 0.89844-2 2s0.89844 2 2 2h10v10c0 1.1016 0.89844 2 2 2s2-0.89844 2-2v-12c0-1.1016-0.89844-2-2-2z" />
               <path d="m80 18h-15c-1.1016 0-2 0.89844-2 2v13h-13c-1.1016 0-2 0.89844-2 2v13h-13c-1.1016 0-2 0.89844-2 2v13h-13c-1.1016 0-2 0.89844-2 2v15c0 1.1016 0.89844 2 2 2s2-0.89844 2-2v-13h13c1.1016 0 2-0.89844 2-2v-13h13c1.1016 0 2-0.89844 2-2v-13h13c1.1016 0 2-0.89844 2-2v-13h13c1.1016 0 2-0.89844 2-2s-0.89844-2-2-2z" />
@@ -50,15 +60,8 @@ export const LayoutCell = memo(function LayoutCell({ type }: LayoutCellProps) {
         </div>
       );
 
-    case "space":
+    case 'space':
     default:
-      return (
-        <div
-          className="size-10"
-          role="gridcell"
-          aria-label="Empty"
-          tabIndex={-1}
-        />
-      );
+      return <div className="size-10" role="gridcell" aria-label="Empty" tabIndex={-1} />;
   }
 });
