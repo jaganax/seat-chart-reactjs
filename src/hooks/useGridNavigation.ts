@@ -1,4 +1,4 @@
-import { useCallback, useRef, type KeyboardEvent, type RefObject } from "react";
+import { useCallback, useRef, type KeyboardEvent, type RefObject } from 'react';
 
 interface UseGridNavigationReturn {
   gridRef: RefObject<HTMLDivElement | null>;
@@ -11,7 +11,7 @@ interface UseGridNavigationReturn {
  * For layout gridcells (driver/door/space), the gridcell div itself is focusable.
  */
 function getFocusableElement(gridcell: HTMLElement): HTMLElement {
-  const button = gridcell.querySelector<HTMLElement>("button");
+  const button = gridcell.querySelector<HTMLElement>('button');
   return button ?? gridcell;
 }
 
@@ -29,10 +29,10 @@ export function useGridNavigation(): UseGridNavigationReturn {
     if (!grid) return;
 
     const isArrowKey =
-      e.key === "ArrowRight" ||
-      e.key === "ArrowLeft" ||
-      e.key === "ArrowDown" ||
-      e.key === "ArrowUp";
+      e.key === 'ArrowRight' ||
+      e.key === 'ArrowLeft' ||
+      e.key === 'ArrowDown' ||
+      e.key === 'ArrowUp';
 
     if (!isArrowKey) return;
 
@@ -40,14 +40,13 @@ export function useGridNavigation(): UseGridNavigationReturn {
     if (!active || !grid.contains(active)) return;
 
     // Find all gridcells (both interactive and non-interactive)
-    const gridcells = Array.from(
-      grid.querySelectorAll<HTMLElement>('[role="gridcell"]')
-    );
+    const gridcells = Array.from(grid.querySelectorAll<HTMLElement>('[role="gridcell"]'));
 
     // Find current gridcell (active element may be the button inside a gridcell)
-    const currentGridcell = active.getAttribute("role") === "gridcell"
-      ? active
-      : active.closest<HTMLElement>('[role="gridcell"]');
+    const currentGridcell =
+      active.getAttribute('role') === 'gridcell'
+        ? active
+        : active.closest<HTMLElement>('[role="gridcell"]');
 
     const currentIndex = currentGridcell ? gridcells.indexOf(currentGridcell) : -1;
     if (currentIndex === -1) return;
@@ -55,16 +54,16 @@ export function useGridNavigation(): UseGridNavigationReturn {
     // For up/down: find cells by spatial position
     let nextIndex: number | undefined;
 
-    if (e.key === "ArrowRight") {
+    if (e.key === 'ArrowRight') {
       nextIndex = currentIndex + 1 < gridcells.length ? currentIndex + 1 : undefined;
-    } else if (e.key === "ArrowLeft") {
+    } else if (e.key === 'ArrowLeft') {
       nextIndex = currentIndex - 1 >= 0 ? currentIndex - 1 : undefined;
     } else {
       // ArrowUp / ArrowDown — find the nearest cell above/below
       const currentFocusable = getFocusableElement(gridcells[currentIndex]);
       const currentRect = currentFocusable.getBoundingClientRect();
       const centerX = currentRect.left + currentRect.width / 2;
-      const direction = e.key === "ArrowDown" ? 1 : -1;
+      const direction = e.key === 'ArrowDown' ? 1 : -1;
 
       let bestIndex: number | undefined;
       let bestDistance = Infinity;
@@ -80,9 +79,7 @@ export function useGridNavigation(): UseGridNavigationReturn {
         // Must be in the correct direction
         if (verticalDiff <= 0) continue;
 
-        const horizontalDiff = Math.abs(
-          rect.left + rect.width / 2 - centerX
-        );
+        const horizontalDiff = Math.abs(rect.left + rect.width / 2 - centerX);
         const distance = verticalDiff + horizontalDiff;
 
         if (distance < bestDistance) {
@@ -101,8 +98,8 @@ export function useGridNavigation(): UseGridNavigationReturn {
       const oldFocusable = getFocusableElement(gridcells[currentIndex]);
       const newFocusable = getFocusableElement(gridcells[nextIndex]);
 
-      oldFocusable.setAttribute("tabindex", "-1");
-      newFocusable.setAttribute("tabindex", "0");
+      oldFocusable.setAttribute('tabindex', '-1');
+      newFocusable.setAttribute('tabindex', '0');
       newFocusable.focus();
 
       activeIndexRef.current = nextIndex;

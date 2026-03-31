@@ -1,7 +1,7 @@
-import "./index.css";
+import './index.css';
 
 // Main component
-export { Chart } from "./components/Chart";
+export { Chart } from './components/Chart';
 
 // Types
 export type {
@@ -11,4 +11,4 @@ export type {
   SelectedSeat,
   LegendItem,
   SeatTypeConfig,
-} from "./types";
+} from './types';

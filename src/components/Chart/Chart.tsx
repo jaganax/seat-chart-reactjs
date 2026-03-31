@@ -1,14 +1,14 @@
-import { useMemo, useCallback, useState, useRef, useEffect, memo } from "react";
-import type { ChartProps, ParsedCell, SeatStatus, SeatType } from "../../types";
-import { isParsedSeat } from "../../types";
-import { parseSeatMap } from "../../utils/parse-seats";
-import type { ParsedSeatMap } from "../../utils/parse-seats";
-import { cn } from "../../utils/cn";
-import { useSelection } from "../../hooks/useSelection";
-import { useGridNavigation } from "../../hooks/useGridNavigation";
-import { SeatButton } from "../SeatButton";
-import { LayoutCell } from "../LayoutCell";
-import { Legend } from "../Legend";
+import { useMemo, useCallback, useState, useRef, useEffect, memo } from 'react';
+import type { ChartProps, ParsedCell, SeatStatus, SeatType } from '../../types';
+import { isParsedSeat } from '../../types';
+import { parseSeatMap } from '../../utils/parse-seats';
+import type { ParsedSeatMap } from '../../utils/parse-seats';
+import { cn } from '../../utils/cn';
+import { useSelection } from '../../hooks/useSelection';
+import { useGridNavigation } from '../../hooks/useGridNavigation';
+import { SeatButton } from '../SeatButton';
+import { LayoutCell } from '../LayoutCell';
+import { Legend } from '../Legend';
 
 interface ParsedLayer {
   name: string;
@@ -17,7 +17,7 @@ interface ParsedLayer {
 
 /** Check if a cell is a berth */
 function isBerthCell(cell: ParsedCell): boolean {
-  return isParsedSeat(cell) && cell.type === "berth";
+  return isParsedSeat(cell) && cell.type === 'berth';
 }
 
 /**
@@ -40,15 +40,15 @@ export const Chart = memo(function Chart({
   // Serialize dependencies to stabilize memoization against inline objects/arrays
   const seatMapsKey = JSON.stringify(seatMaps);
   const seatTypesKey = JSON.stringify(seatTypes);
-  const bookedKey = bookedSeats?.join(",") ?? "";
-  const blockedKey = blockedSeats?.join(",") ?? "";
+  const bookedKey = bookedSeats?.join(',') ?? '';
+  const blockedKey = blockedSeats?.join(',') ?? '';
 
   // Parse seat maps for all layers, continuing seat index across layers
   const parsedLayers = useMemo((): ParsedLayer[] => {
     // Check if seatMaps is an array (single layer) or object (multi-layer)
     if (Array.isArray(seatMaps)) {
       const result = parseSeatMap(seatMaps, seatTypes, bookedSeats, blockedSeats);
-      return [{ name: "", seatMap: result.seatMap }];
+      return [{ name: '', seatMap: result.seatMap }];
     }
     // Multi-layer: object with named layers, continue numbering across layers
     const layers: ParsedLayer[] = [];
@@ -73,13 +73,13 @@ export const Chart = memo(function Chart({
   });
 
   // Live region state for screen reader announcements
-  const [maxReachedMessage, setMaxReachedMessage] = useState("");
+  const [maxReachedMessage, setMaxReachedMessage] = useState('');
   const clearTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   // Clear max reached message after announcement
   useEffect(() => {
     if (maxReachedMessage) {
-      clearTimerRef.current = setTimeout(() => setMaxReachedMessage(""), 1000);
+      clearTimerRef.current = setTimeout(() => setMaxReachedMessage(''), 1000);
       return () => clearTimeout(clearTimerRef.current);
     }
   }, [maxReachedMessage]);
@@ -88,7 +88,7 @@ export const Chart = memo(function Chart({
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div className={cn("w-fit", className)}>
+    <div className={cn('w-fit', className)}>
       {isMultiLayer ? (
         <div className="flex flex-col">
           {/* Tab list */}
@@ -103,21 +103,21 @@ export const Chart = memo(function Chart({
                 aria-controls={`seat-chart-tabpanel-${index}`}
                 tabIndex={activeTab === index ? 0 : -1}
                 className={cn(
-                  "flex-1 px-4 py-2 text-sm font-medium rounded-t-lg border border-b-0 -mb-px transition-colors motion-reduce:transition-none",
+                  'flex-1 px-4 py-2 text-sm font-medium rounded-t-lg border border-b-0 -mb-px transition-colors motion-reduce:transition-none',
                   activeTab === index
-                    ? "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 z-10"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer"
+                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 z-10'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-transparent hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer',
                 )}
                 onClick={() => setActiveTab(index)}
                 onKeyDown={(e) => {
                   let nextIndex: number | undefined;
-                  if (e.key === "ArrowRight") {
+                  if (e.key === 'ArrowRight') {
                     nextIndex = (index + 1) % parsedLayers.length;
-                  } else if (e.key === "ArrowLeft") {
+                  } else if (e.key === 'ArrowLeft') {
                     nextIndex = (index - 1 + parsedLayers.length) % parsedLayers.length;
-                  } else if (e.key === "Home") {
+                  } else if (e.key === 'Home') {
                     nextIndex = 0;
-                  } else if (e.key === "End") {
+                  } else if (e.key === 'End') {
                     nextIndex = parsedLayers.length - 1;
                   }
                   if (nextIndex !== undefined) {
@@ -173,8 +173,8 @@ export const Chart = memo(function Chart({
       {/* Live region: selection count */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {selectedLabels.size > 0
-          ? `${selectedLabels.size} seat${selectedLabels.size !== 1 ? "s" : ""} selected`
-          : ""}
+          ? `${selectedLabels.size} seat${selectedLabels.size !== 1 ? 's' : ''} selected`
+          : ''}
       </div>
 
       {/* Live region: max seats reached */}
@@ -189,12 +189,7 @@ interface ChartLayerProps {
   layer: ParsedLayer;
   layerIndex: number;
   selectedLabels: Set<string>;
-  onToggle: (seat: {
-    label: string;
-    type: SeatType;
-    price: number;
-    status: SeatStatus;
-  }) => void;
+  onToggle: (seat: { label: string; type: SeatType; price: number; status: SeatStatus }) => void;
   disabled: boolean;
   priceFormatter?: (price: number) => string;
   /** When true, the layer name heading is suppressed (tabbed layout provides the label) */
@@ -242,16 +237,20 @@ const ChartLayer = memo(function ChartLayer({
           </h3>
         )}
         <p id={instructionsId} className="sr-only">
-          Use arrow keys to navigate between seats. Press Enter or Space to select or deselect a seat.
+          Use arrow keys to navigate between seats. Press Enter or Space to select or deselect a
+          seat.
         </p>
         <div
           ref={gridRef}
           role="grid"
           tabIndex={-1}
           aria-labelledby={headingId}
-          aria-label={headingId ? undefined : "Seat chart"}
+          aria-label={headingId ? undefined : 'Seat chart'}
           aria-describedby={instructionsId}
-          className={cn("flex flex-col p-2 border border-gray-300 dark:border-gray-600 gap-2", hideHeading ? "rounded-b-lg" : "rounded-lg")}
+          className={cn(
+            'flex flex-col p-2 border border-gray-300 dark:border-gray-600 gap-2',
+            hideHeading ? 'rounded-b-lg' : 'rounded-lg',
+          )}
           onKeyDown={handleGridKeyDown}
         >
           {layer.seatMap.map((row, rowIndex) => (
@@ -292,16 +291,19 @@ const ChartLayer = memo(function ChartLayer({
         role="grid"
         tabIndex={-1}
         aria-labelledby={headingId}
-        aria-label={headingId ? undefined : "Seat chart"}
+        aria-label={headingId ? undefined : 'Seat chart'}
         aria-describedby={instructionsId}
-        className={cn("grid p-2 border border-gray-300 dark:border-gray-600 gap-2 justify-center", hideHeading ? "rounded-b-lg" : "rounded-lg")}
+        className={cn(
+          'grid p-2 border border-gray-300 dark:border-gray-600 gap-2 justify-center',
+          hideHeading ? 'rounded-b-lg' : 'rounded-lg',
+        )}
         onKeyDown={handleGridKeyDown}
         style={{
           gridTemplateColumns: `repeat(${numCols}, auto)`,
         }}
       >
         {layer.seatMap.map((row, rowIndex) => (
-          <div key={rowIndex} role="row" style={{ display: "contents" }}>
+          <div key={rowIndex} role="row" style={{ display: 'contents' }}>
             {row.map((cell, colIndex) => (
               <ChartCell
                 key={`${layerIndex}-${rowIndex}-${colIndex}`}
@@ -324,12 +326,7 @@ const ChartLayer = memo(function ChartLayer({
 interface ChartCellProps {
   cell: ParsedCell;
   selected: boolean;
-  onToggle: (seat: {
-    label: string;
-    type: SeatType;
-    price: number;
-    status: SeatStatus;
-  }) => void;
+  onToggle: (seat: { label: string; type: SeatType; price: number; status: SeatStatus }) => void;
   disabled: boolean;
   gridRow?: number;
   gridCol?: number;
@@ -352,12 +349,13 @@ const ChartCell = memo(function ChartCell({
   }, [cell, onToggle]);
 
   const isBerth = isBerthCell(cell);
-  const gridStyle = gridRow !== undefined && gridCol !== undefined
-    ? {
-        gridRow: isBerth ? `${gridRow} / span 2` : gridRow,
-        gridColumn: gridCol,
-      }
-    : undefined;
+  const gridStyle =
+    gridRow !== undefined && gridCol !== undefined
+      ? {
+          gridRow: isBerth ? `${gridRow} / span 2` : gridRow,
+          gridColumn: gridCol,
+        }
+      : undefined;
 
   if (isParsedSeat(cell)) {
     return (

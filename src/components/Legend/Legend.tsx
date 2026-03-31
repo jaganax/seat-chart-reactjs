@@ -1,6 +1,6 @@
-import { memo } from "react";
-import type { LegendProps, LegendItem, SeatStatus } from "../../types";
-import { SeatButton } from "../SeatButton";
+import { memo } from 'react';
+import type { LegendProps, LegendItem, SeatStatus } from '../../types';
+import { SeatButton } from '../SeatButton';
 
 /**
  * Legend component showing seat status colors and their meanings.
@@ -14,7 +14,7 @@ export const Legend = memo(function Legend({ legends }: LegendProps) {
       aria-label="Seat status legend"
     >
       {legends.map((legend) => (
-        <LegendRow key={`${legend.status}-${legend.type ?? "seat"}`} legend={legend} />
+        <LegendRow key={`${legend.status}-${legend.type ?? 'seat'}`} legend={legend} />
       ))}
     </div>
   );
@@ -25,16 +25,13 @@ interface LegendRowProps {
 }
 
 const LegendRow = memo(function LegendRow({ legend }: LegendRowProps) {
-  const type = legend.type ?? "seat";
-  const isSelected = legend.status === "selected";
+  const type = legend.type ?? 'seat';
+  const isSelected = legend.status === 'selected';
   // For "selected" status, we show an available seat with isSelected=true
-  const status: SeatStatus = isSelected ? "available" : legend.status as SeatStatus;
+  const status: SeatStatus = isSelected ? 'available' : (legend.status as SeatStatus);
 
   return (
-    <div
-      className="flex items-center gap-1.5"
-      role="listitem"
-    >
+    <div className="flex items-center gap-1.5" role="listitem">
       <div className="scale-75 origin-left">
         <SeatButton
           type={type}
