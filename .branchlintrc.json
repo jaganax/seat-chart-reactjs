@@ -1,4 +1,10 @@
 {
-  "pattern": "^(feat|fix|refactor|chore)/[a-z0-9-]+$",
-  "prohibited": ["main", "master", "dev"]
+  "branchNameLinter": {
+    "regex": "^(feat|fix|refactor|chore)/[a-z0-9-]+$",
+    "prefixes": ["feat", "fix", "refactor", "chore"],
+    "separator": "/",
+    "disallowed": ["main", "master", "dev"],
+    "msgDoesNotMatchRegex": "Branch \"%s\" does not match the allowed pattern: \"%s\"\nExample: feat/my-feature, fix/bug-description",
+    "msgBranchDisallowed": "Pushing directly to \"%s\" is not allowed. Use a feature branch instead."
+  }
 }
