@@ -49,15 +49,18 @@ export function useSelection({
 
   // Refs for callbacks and config — avoids dependency churn on toggleSelection
   const callbacksRef = useRef({ onSelectionChange, maxSelectableSeats, onMaxSeatsReached });
+  // eslint-disable-next-line react-hooks/refs -- intentional keep-ref-fresh pattern, only read outside render
   callbacksRef.current = { onSelectionChange, maxSelectableSeats, onMaxSeatsReached };
 
   // Refs for current state — read inside stable toggleSelection
   const selectionRef = useRef(selection);
+  // eslint-disable-next-line react-hooks/refs -- intentional keep-ref-fresh pattern, only read outside render
   selectionRef.current = selection;
 
   // Set for O(1) lookup — recomputed only when selection changes
   const selectedLabels = useMemo(() => new Set(selection.map((s) => s.label)), [selection]);
   const selectedLabelsRef = useRef(selectedLabels);
+  // eslint-disable-next-line react-hooks/refs -- intentional keep-ref-fresh pattern, only read outside render
   selectedLabelsRef.current = selectedLabels;
 
   // Stable — reads refs, never recreated

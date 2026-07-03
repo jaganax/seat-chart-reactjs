@@ -1,4 +1,8 @@
-@import "tailwindcss";
+@layer seat-chart-reactjs;
+
+@import 'tailwindcss/theme' layer(seat-chart-reactjs);
+@import 'tailwindcss/preflight' layer(seat-chart-reactjs);
+@import 'tailwindcss/utilities' layer(seat-chart-reactjs);
 
 @source "./**/*.{ts,tsx}";
 
