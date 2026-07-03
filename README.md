@@ -30,7 +30,7 @@ Peer dependencies:
 
 ```css
 /* app/globals.css or your main CSS file */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Adjust the path based on your CSS file's location relative to node_modules */
 @source "../node_modules/@jaganax/seat-chart-reactjs/dist";
@@ -41,7 +41,13 @@ Peer dependencies:
 **If your project does NOT use Tailwind**, import the pre-built CSS:
 
 ```js
-import "@jaganax/seat-chart-reactjs/styles.css";
+import '@jaganax/seat-chart-reactjs/styles.css';
+```
+
+This stylesheet is scoped to its own `seat-chart-reactjs` [CSS cascade layer](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer), so it won't collide with class names in a host app's own Tailwind build even if imported by mistake. If you do use Tailwind and need to control precedence explicitly, declare layer order in your own CSS before importing either:
+
+```css
+@layer theme, base, components, utilities, seat-chart-reactjs;
 ```
 
 ## Usage
@@ -51,41 +57,41 @@ import "@jaganax/seat-chart-reactjs/styles.css";
 Import the `Chart` component and provide your seat map and configuration:
 
 ```jsx
-import { Chart } from "@jaganax/seat-chart-reactjs";
+import { Chart } from '@jaganax/seat-chart-reactjs';
 
 const seatMaps = [
-  "____d",
-  "a[1,R1]a_ss",
-  "aa_ss",
-  "a[1,R1]a_ss",
-  "w__aa",
+  '____d',
+  'a[1,R1]a_ss',
+  'aa_ss',
+  'a[1,R1]a_ss',
+  'w__aa',
   // ...more rows
 ];
 
 const seatTypes = {
-  a: { type: "seat", price: 100 },
-  s: { type: "seat", price: 100 },
-  d: { type: "driver" },
-  w: { type: "door" },
+  a: { type: 'seat', price: 100 },
+  s: { type: 'seat', price: 100 },
+  d: { type: 'driver' },
+  w: { type: 'door' },
 };
 
 const legends = [
-  { status: "available", type: "seat" },
-  { status: "booked", type: "seat" },
-  { status: "blocked", type: "seat" },
-  { status: "selected", type: "seat" },
+  { status: 'available', type: 'seat' },
+  { status: 'booked', type: 'seat' },
+  { status: 'blocked', type: 'seat' },
+  { status: 'selected', type: 'seat' },
 ];
 
 function handleSelectionChange(seats) {
-  console.log("Selected seats:", seats);
+  console.log('Selected seats:', seats);
 }
 
 <Chart
   seatMaps={seatMaps}
   seatTypes={seatTypes}
   onSelectionChange={handleSelectionChange}
-  bookedSeats={["2", "5", "8", "R1"]}
-  blockedSeats={["4", "3", "6"]}
+  bookedSeats={['2', '5', '8', 'R1']}
+  blockedSeats={['4', '3', '6']}
   legends={legends}
   maxSelectableSeats={6}
   onMaxSeatsReached={(max) => console.log(`Maximum ${max} seats allowed`)}
@@ -97,68 +103,56 @@ function handleSelectionChange(seats) {
 For multi-layer seating like double-decker buses:
 
 ```jsx
-import { Chart } from "@jaganax/seat-chart-reactjs";
+import { Chart } from '@jaganax/seat-chart-reactjs';
 
 const seatMaps = {
-  "Lower Deck": [
-    "____d",
-    "a[1,L1]a_aa",
-    "aa_aa",
-    "w__aa",
-    "aa_aa",
-  ],
-  "Upper Deck": [
-    "_____",
-    "b[1,U1]b_bb",
-    "bb_bb",
-    "___bb",
-    "bb_bb",
-  ],
+  'Lower Deck': ['____d', 'a[1,L1]a_aa', 'aa_aa', 'w__aa', 'aa_aa'],
+  'Upper Deck': ['_____', 'b[1,U1]b_bb', 'bb_bb', '___bb', 'bb_bb'],
 };
 
 const seatTypes = {
-  a: { type: "seat", price: 100 },
-  b: { type: "berth", price: 150 },
-  d: { type: "driver" },
-  w: { type: "door" },
+  a: { type: 'seat', price: 100 },
+  b: { type: 'berth', price: 150 },
+  d: { type: 'driver' },
+  w: { type: 'door' },
 };
 
 <Chart
   seatMaps={seatMaps}
   seatTypes={seatTypes}
   onSelectionChange={(seats) => console.log(seats)}
-  bookedSeats={["L1", "U1"]}
+  bookedSeats={['L1', 'U1']}
   legends={[
-    { status: "available", type: "seat" },
-    { status: "available", type: "berth" },
-    { status: "booked", type: "seat" },
-    { status: "selected", type: "seat" },
+    { status: 'available', type: 'seat' },
+    { status: 'available', type: 'berth' },
+    { status: 'booked', type: 'seat' },
+    { status: 'selected', type: 'seat' },
   ]}
 />;
 ```
 
 ## Props
 
-| Prop                 | Type                                   | Description                                         |
-| -------------------- | -------------------------------------- | --------------------------------------------------- |
-| `seatMaps`           | `string[] \| Record<string, string[]>` | Seat map array or object with named layers          |
-| `seatTypes`          | `Record<string, SeatTypeConfig>`       | Mapping of seat type keys to type/price config      |
-| `onSelectionChange`  | `(seats: SelectedSeat[]) => void`      | Callback when selection changes                     |
-| `maxSelectableSeats` | `number`                               | Maximum number of selectable seats                  |
-| `onMaxSeatsReached`  | `(maxSeats: number) => void`           | Callback when max selection limit is reached        |
-| `bookedSeats`        | `string[]`                             | Array of booked seat labels                         |
-| `blockedSeats`       | `string[]`                             | Array of blocked seat labels                        |
-| `legends`            | `LegendItem[]`                         | Array of legend items for seat statuses             |
-| `disabled`           | `boolean`                              | Disable all seat selection                          |
-| `className`          | `string`                               | Additional CSS class for the chart container        |
+| Prop                 | Type                                   | Description                                                  |
+| -------------------- | -------------------------------------- | ------------------------------------------------------------ |
+| `seatMaps`           | `string[] \| Record<string, string[]>` | Seat map array or object with named layers                   |
+| `seatTypes`          | `Record<string, SeatTypeConfig>`       | Mapping of seat type keys to type/price config               |
+| `onSelectionChange`  | `(seats: SelectedSeat[]) => void`      | Callback when selection changes                              |
+| `maxSelectableSeats` | `number`                               | Maximum number of selectable seats                           |
+| `onMaxSeatsReached`  | `(maxSeats: number) => void`           | Callback when max selection limit is reached                 |
+| `bookedSeats`        | `string[]`                             | Array of booked seat labels                                  |
+| `blockedSeats`       | `string[]`                             | Array of blocked seat labels                                 |
+| `legends`            | `LegendItem[]`                         | Array of legend items for seat statuses                      |
+| `disabled`           | `boolean`                              | Disable all seat selection                                   |
+| `className`          | `string`                               | Additional CSS class for the chart container                 |
 | `priceFormatter`     | `(price: number) => string`            | Custom price formatter for aria-labels (default: `$<price>`) |
 
 ## Types
 
 ```typescript
-type SeatStatus = "available" | "booked" | "blocked";
-type SeatType = "seat" | "berth";
-type LayoutType = "driver" | "door" | "space";
+type SeatStatus = 'available' | 'booked' | 'blocked';
+type SeatType = 'seat' | 'berth';
+type LayoutType = 'driver' | 'door' | 'space';
 
 interface SeatTypeConfig {
   type: SeatType | LayoutType;
@@ -173,7 +167,7 @@ interface SelectedSeat {
 }
 
 interface LegendItem {
-  status: SeatStatus | "selected";
+  status: SeatStatus | 'selected';
   type?: SeatType;
 }
 ```
@@ -191,6 +185,7 @@ See the [Storybook](#) for live examples and customization options.
 ## Accessibility
 
 The component includes full accessibility support:
+
 - ARIA grid pattern for screen readers
 - Keyboard navigation (Tab to enter/exit, Enter/Space to toggle)
 - Focus indicators
